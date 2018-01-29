@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class ServicesService {
   private ws:WebSocket;
-  private WS_URL:string = "ws://10.10.2.50:8080";
+  private WS_URL:string = "ws://10.10.2.50:8081";
   constructor() {
 
   }

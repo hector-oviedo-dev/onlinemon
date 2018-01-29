@@ -3,6 +3,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+import { ModalModule } from 'ngx-modal';
+
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
@@ -34,6 +36,7 @@ import { DiagramComponent } from './diagram/diagram.component';
   imports: [
     BrowserModule,
     FormsModule,
+    ModalModule,
     BrowserAnimationsModule,
     FlexLayoutModule,
     MatTabsModule,

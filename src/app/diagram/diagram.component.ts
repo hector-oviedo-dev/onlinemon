@@ -10,76 +10,160 @@ import * as go from 'gojs';
 export class DiagramComponent implements OnInit {
   private diagram: go.Diagram = new go.Diagram();
 
+  @ViewChild('modal')
+  private modalRef: ElementRef;
+
   @ViewChild('diagramDiv')
   private diagramRef: ElementRef;
 
-  constructor(private services:ServicesService) {
+  public objectwidth = 45;
 
-    services.connect();
+  public actualItem = { uid:"000001", state: "Estado: Online", loc: { x:0, y:0 }, color: "green" };
+
+  constructor(private services:ServicesService) {
+    //services.connect();
 
     const $ = go.GraphObject.make;
-      this.diagram = new go.Diagram();
-      this.diagram.initialContentAlignment = go.Spot.Center;
-      this.diagram.allowDrop = true;
-      this.diagram.undoManager.isEnabled = true;
-      this.diagram.toolManager.hoverDelay = 100;
+    const that = this;
 
-      /*
-      this.diagram.addDiagramListener("ChangedSelection",
-          e => {
-            const node = e.diagram.selection.first();
-            this.nodeSelected.emit(node instanceof go.Node ? node : null);
-          });
-      this.diagram.addModelChangedListener(e => e.isTransactionFinished && this.modelChanged.emit(e));
-      */
-      this.diagram.nodeTemplate =
-      $(go.Node,
-        new go.Binding("location", "loc"),
-        { locationSpot: go.Spot.Center },
+    this.diagram = new go.Diagram();
+    this.diagram.initialContentAlignment = go.Spot.Center;
 
-        $(go.Shape, "Square",
-          new go.Binding("fill", "color"),
-          new go.Binding("width", "width"),
-          new go.Binding("angle", "angle"),
-          ),  // also specified by data
-          $(go.TextBlock,
-            { margin: 8, wrap: go.TextBlock.WrapFit, textAlign: "center" },  // some room around the text
-            // TextBlock.text is bound to Node.data.key
-            new go.Binding("text", "uid"),
-            new go.Binding("angle", "angle")
-          ),
-        { // this tooltip shows the name and picture of the kitten
-          toolTip:
-            $(go.Adornment, "Auto",
-              $(go.Shape, { fill: "lightyellow" }),
-              $(go.Panel, "Vertical",
-                $(go.TextBlock, { margin: 3 },
-                  new go.Binding("text", "uid")),
-                $(go.TextBlock, { margin: 3 },
-                  new go.Binding("text", "estado"))
-              )
-            )  // end Adornment
-        }
-      );
+    this.diagram.undoManager.isEnabled = true;
+    this.diagram.toolManager.hoverDelay = 100;
+    //this.diagram.allowSelect = false;
+    this.diagram.allowDrop = true;
+    this.diagram.allowMove = true;
+    //this.diagram.toolManager.rotatingTool = new RotateMultipleTool();
 
-      // initialize contents of Palette
-      this.diagram.model.nodeDataArray =
-        [
-          { uid:"4453", estado: "Estado: Offline", src: "50x40", loc: new go.Point(220, 130), color: "red", angle:32, width:50 },
-          { uid:"442353", estado: "Estado: Online", src: "55x55", loc: new go.Point(420, 250), color: "green", angle:0, width:50 },
-          { uid:"1232143", estado: "Estado: Puerta Abierta", src: "60x90", loc: new go.Point(640, 450), color: "yellow", angle:0, width:50 }
-        ];
-        //background image
-        this.diagram.add(
-        $(go.Part,  // this Part is not bound to any model data
-          { layerName: "Background", position: new go.Point(0, 0),
-            selectable: false, pickable: false },
-          $(go.Picture, "https://upload.wikimedia.org/wikipedia/commons/9/9a/Sample_Floorplan.jpg")
-        ));
+    //this.diagram.addDiagramListener("ObjectSingleClicked", (e) => this.onClick(e));
+    //this.diagram.addDiagramListener("SelectionMoved", (e) => this.onDrop(e));
+
+    this.diagram.nodeTemplate =
+    $(go.Node,"Auto",
+      {
+        //isActionable:true,
+        //allowDrop:true,
+        mouseOver: function (e, obj) { that.onDrop({ data:obj.part.Zd, loc:obj.part.location }); },
+        doubleClick: function (e, obj) { that.onClick({ data:obj.part.Zd, loc:obj.part.location }); }
+      },
+      new go.Binding("location", "loc"),
+      {
+        locationSpot: go.Spot.Center,
+      },
+      $(go.Shape, "Square",
+      {
+        width:this.objectwidth,
+      },
+        new go.Binding("fill", "color"),
+        new go.Binding("angle", "angle"),
+        ),
+        $(go.TextBlock, { margin: 3 },
+          new go.Binding("text", "uid"),
+          new go.Binding("angle", "angle")
+        ),
+      {
+        toolTip:
+          $(go.Adornment, "Auto",
+          $(go.Shape, { fill: "lightyellow" }),
+          $(go.Panel, "Vertical",
+            $(go.TextBlock, { margin: 3 },
+              new go.Binding("text", "uid")),
+            $(go.TextBlock, { margin: 3 },
+              new go.Binding("text", "state"))
+          )
+        )
+      }
+    );
+
+    this.diagram.toolManager.rotatingTool.handleArchetype =
+        $(go.Shape, "XLine",
+          { width: 8, height: 8, stroke: "green", fill: "transparent" });
+
+    this.populate(null);
+  }
+  public onClick(data) {
+   //console.log("on click " + data.data.uid);
+   this.actualItem = data.data;
+   (this.modalRef as any).open();
+  }
+  public setNode(uid) {
+    let found:boolean = false;
+    for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
+      let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
+      if (actualOBJ.uid == uid) {
+        let actualX = parseInt(actualOBJ.loc.x);
+        let actualY = parseInt(actualOBJ.loc.y);
+
+        let rect = this.diagram.viewportBounds;
+
+        let x = actualX - rect.width/2;
+        let y = actualY - rect.height/2;
+
+        let point  = new go.Point(x,y)
+        this.diagram.position = point;
+      }
     }
 
+
+  }
+  public onDrop(e) {
+   //console.log("on drop");
+   for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
+     let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
+     if (actualOBJ.uid == e.data.uid) {
+       let actualX = parseInt(e.loc.x);
+       let actualY = parseInt(e.loc.y);
+
+       if (actualX != actualOBJ.loc.x && actualY != actualOBJ.loc.y) {
+         console.log("THIS HAS BEEN MOVED");
+         (this.diagram.model.nodeDataArray[i] as any).loc.x = actualX;
+         (this.diagram.model.nodeDataArray[i] as any).loc.y = actualY;
+       }
+     }
+   }
+   this.diagram.clearSelection();
+  }
+  public populate(data) {
+    data = {
+      machines:[
+        { uid:"000001", state: "Estado: Online", loc: { x:0, y:0 }, color: "green", angle:0 },
+        { uid:"000002", state: "Estado: Offline", loc: { x:50, y:0 }, color: "red", angle:0 },
+        { uid:"000003", state: "Estado: Online", loc: { x:100, y:0 }, color: "green", angle:0 },
+        { uid:"000004", state: "Estado: Online", loc: { x:150, y:0 }, color: "green", angle:30 },
+        { uid:"000005", state: "Estado: Offline", loc: { x:0, y:50 }, color: "red", angle:0 },
+        { uid:"000006", state: "Estado: Online", loc: { x:0, y:100 }, color: "green", angle:0 },
+        { uid:"000007", state: "Estado: Open Door", loc: { x:0, y:150 }, color: "yellow", angle:0 },
+        { uid:"000008", state: "Estado: Online", loc: { x:0, y:200 }, color: "green", angle:0 }
+      ]
+    }
+
+    const $ = go.GraphObject.make;
+
+    let arr = JSON.parse(JSON.stringify(data));
+
+    let nodes = [];
+    for (let i = 0; i < arr.machines.length;i++) {
+      let obj = {
+        uid:arr.machines[i].uid,
+        state:arr.machines[i].state,
+        loc: new go.Point(arr.machines[i].loc.x , arr.machines[i].loc.y),
+        color:arr.machines[i].color,
+        angle:arr.machines[i].angle
+      }
+      nodes.push(obj);
+    }
+    this.diagram.model.nodeDataArray = nodes;
+
+    //background image
+    this.diagram.add(
+    $(go.Part,
+      { layerName: "Background", position: new go.Point(0, 0),
+        selectable: false, pickable: false },
+      $(go.Picture, "https://upload.wikimedia.org/wikipedia/commons/9/9a/Sample_Floorplan.jpg")
+    ));
+  }
   ngOnInit() {
     this.diagram.div = this.diagramRef.nativeElement;
   }
-
 }
