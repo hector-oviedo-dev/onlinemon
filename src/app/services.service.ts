@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
+import { EventsService } from 'angular4-events';
 
 @Injectable()
 export class ServicesService {
   private ws:WebSocket;
-  private WS_URL:string = "ws://10.10.2.50:8081";
-  constructor() {
+  private WS_URL:string = "ws://10.10.2.50:8080";
+  constructor(public events:EventsService) {
 
   }
   public connect() {
@@ -55,6 +56,7 @@ export class ServicesService {
     //this._events.publish('onerror', err);
   }
   public sendMessage(msg) {
+    console.log("sending " + msg)
     this.ws.send(msg);
   }
 }

@@ -1,7 +1,48 @@
-<mat-list>
- <mat-list-item><div style="text-align:center;min-width:100%;"><h3>Views</h3></div></mat-list-item>
- <mat-list-item><button mat-raised-button style="min-width:100%;">Estado</button></mat-list-item>
- <mat-list-item><button mat-raised-button style="min-width:100%;">Mapa Termico</button></mat-list-item>
- <mat-list-item> <button mat-raised-button style="min-width:100%;">Filtros</button></mat-list-item>
- <mat-list-item> <button mat-raised-button style="min-width:100%;">Buscar</button></mat-list-item>
-</mat-list>
+<div class="container">
+  <mat-list>
+   <mat-list-item><div style="text-align:center;min-width:100%;"><h3>Views</h3></div></mat-list-item>
+   <mat-list-item><button mat-raised-button style="min-width:100%;">Estado</button></mat-list-item>
+   <mat-list-item><button mat-raised-button style="min-width:100%;">Mapa Termico</button></mat-list-item>
+   <mat-list-item><button mat-raised-button style="min-width:100%;" (click)="!toggle.filter ? toggle.filter=true:toggle.filter=false">Filtros</button></mat-list-item>
+   <mat-list *ngIf="toggle.filter">
+
+     <mat-accordion>
+     <mat-expansion-panel *ngFor="let filter of filters" (opened)="primary = filter.value">
+         <mat-expansion-panel-header>
+           <mat-panel-title>
+             {{filter.label}}
+           </mat-panel-title>
+         </mat-expansion-panel-header>
+
+         <mat-radio-group *ngIf="(primary==filter.value)" [(ngModel)]="secondary">
+           <mat-list-item *ngFor="let sub of filter.values"><mat-checkbox value="sub.value">{{sub.label}}</mat-checkbox>
+           </mat-list-item>
+         </mat-radio-group>
+
+   </mat-expansion-panel>
+   </mat-accordion>
+
+   </mat-list>
+  </mat-list>
+</div>
+<br>
+<mat-divider></mat-divider>
+<br>
+<div class="container">
+
+
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Buscar
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+<div class="">
+  <mat-list>
+    <mat-list-item><input matInput placeholder="UID" type="number" max="999" id="uid" #uid></mat-list-item>
+    <mat-list-item style="text-align:right"><button mat-raised-button color="primary" (click)="doSearch()">Buscar</button></mat-list-item>
+  </mat-list>
+</div>
+
+</mat-expansion-panel>
+</div>

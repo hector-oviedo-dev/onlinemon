@@ -26,6 +26,7 @@
     "@angular/router": "^5.2.0",
     "ag-grid": "^16.0.0",
     "ag-grid-angular": "^16.0.0",
+    "angular4-events": "^5.0.0",
     "core-js": "^2.4.1",
     "gojs": "^1.8.10",
     "ngx-modal": "0.0.29",

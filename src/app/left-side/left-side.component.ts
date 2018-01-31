@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { ServicesService } from '../services.service';
+import { EventsService } from 'angular4-events';
 
 @Component({
   selector: 'app-left-side',
@@ -6,10 +8,34 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./left-side.component.css']
 })
 export class LeftSideComponent implements OnInit {
+  private events: EventsService;
 
-  constructor() { }
+  @ViewChild("uid")
+  private uid:ElementRef;
 
-  ngOnInit() {
+  public toggle = { search:false, filters:false }
+  public filters = [
+    { label:"Marca", value:"brand",
+      values:[{label:"IGT", value:"IGT"},{label:"WILLIAMS", value:"WILLIAMS"},{label:"BALLI", value:"BALLI"}]
+    },
+    { label:"Estado" , value:"state",
+      values:[{label:"Online",value:"online"},{label:"Offline",value:"offline"}]
+    }
+  ];
+  public primary:string;
+  public secondary:string;
+
+  constructor(private services:ServicesService) {
+    this.events = services.events;
   }
-
+  ngOnInit() {
+    
+  }
+  public doSearch() {
+    console.log("search")
+    this.events.publish("onSearch", this.uid.nativeElement.value);
+  }
+  public doFilter() {
+    this.events.publish("onFilter", "");
+  }
 }

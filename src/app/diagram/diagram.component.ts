@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
 import { ServicesService } from '../services.service';
+import { EventsService } from 'angular4-events';
 import * as go from 'gojs';
 
 @Component({
@@ -10,18 +11,15 @@ import * as go from 'gojs';
 export class DiagramComponent implements OnInit {
   private diagram: go.Diagram = new go.Diagram();
 
-  @ViewChild('modal')
-  private modalRef: ElementRef;
-
   @ViewChild('diagramDiv')
   private diagramRef: ElementRef;
 
-  public objectwidth = 45;
+  public objectwidth = 75;
 
-  public actualItem = { uid:"000001", state: "Estado: Online", loc: { x:0, y:0 }, color: "green" };
-
+  private events: EventsService;
   constructor(private services:ServicesService) {
-    //services.connect();
+    services.connect();
+    this.events = services.events;
 
     const $ = go.GraphObject.make;
     const that = this;
@@ -34,6 +32,9 @@ export class DiagramComponent implements OnInit {
     //this.diagram.allowSelect = false;
     this.diagram.allowDrop = true;
     this.diagram.allowMove = true;
+    this.diagram.allowCopy = false;
+    this.diagram.allowDelete = false;
+    this.diagram.allowInsert = false;
     //this.diagram.toolManager.rotatingTool = new RotateMultipleTool();
 
     //this.diagram.addDiagramListener("ObjectSingleClicked", (e) => this.onClick(e));
@@ -51,12 +52,12 @@ export class DiagramComponent implements OnInit {
       {
         locationSpot: go.Spot.Center,
       },
-      $(go.Shape, "Square",
+      $(go.Shape, "Circle",
       {
         width:this.objectwidth,
       },
         new go.Binding("fill", "color"),
-        new go.Binding("angle", "angle"),
+        new go.Binding("angle", "angle").makeTwoWay(),
         ),
         $(go.TextBlock, { margin: 3 },
           new go.Binding("text", "uid"),
@@ -84,8 +85,7 @@ export class DiagramComponent implements OnInit {
   }
   public onClick(data) {
    //console.log("on click " + data.data.uid);
-   this.actualItem = data.data;
-   (this.modalRef as any).open();
+   this.events.publish("onPopup", data)
   }
   public setNode(uid) {
     let found:boolean = false;
@@ -104,8 +104,17 @@ export class DiagramComponent implements OnInit {
         this.diagram.position = point;
       }
     }
-
-
+    this.setFilter("brand","IGT")
+  }
+  public setFilter(type ,value) {
+    let found:boolean = false;
+    for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
+      let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
+      if (actualOBJ[type] == value) {
+        console.log( type + " found at " + JSON.stringify(this.diagram.model.nodeDataArray[i]));
+        (this.diagram.model.nodeDataArray[i] as any).visible = false;
+      } else (this.diagram.model.nodeDataArray[i] as any).visible = true;
+    }
   }
   public onDrop(e) {
    //console.log("on drop");
@@ -119,6 +128,8 @@ export class DiagramComponent implements OnInit {
          console.log("THIS HAS BEEN MOVED");
          (this.diagram.model.nodeDataArray[i] as any).loc.x = actualX;
          (this.diagram.model.nodeDataArray[i] as any).loc.y = actualY;
+
+         this.services.sendMessage(JSON.stringify(actualOBJ));
        }
      }
    }
@@ -127,14 +138,14 @@ export class DiagramComponent implements OnInit {
   public populate(data) {
     data = {
       machines:[
-        { uid:"000001", state: "Estado: Online", loc: { x:0, y:0 }, color: "green", angle:0 },
-        { uid:"000002", state: "Estado: Offline", loc: { x:50, y:0 }, color: "red", angle:0 },
-        { uid:"000003", state: "Estado: Online", loc: { x:100, y:0 }, color: "green", angle:0 },
-        { uid:"000004", state: "Estado: Online", loc: { x:150, y:0 }, color: "green", angle:30 },
-        { uid:"000005", state: "Estado: Offline", loc: { x:0, y:50 }, color: "red", angle:0 },
-        { uid:"000006", state: "Estado: Online", loc: { x:0, y:100 }, color: "green", angle:0 },
-        { uid:"000007", state: "Estado: Open Door", loc: { x:0, y:150 }, color: "yellow", angle:0 },
-        { uid:"000008", state: "Estado: Online", loc: { x:0, y:200 }, color: "green", angle:0 }
+        { uid:"000001", state: "online", details:"Maquina Online", loc: { x:0, y:0 }, color: "green", brand:"IGT", angle:0 },
+        { uid:"000002", state: "offline", details:"Maquina Offline", loc: { x:50, y:0 }, color: "red", brand:"WILLIAMS",angle:0 },
+        { uid:"000003", state: "online", details:"Maquina Online", loc: { x:100, y:0 }, color: "green", brand:"IGT",angle:0 },
+        { uid:"000004", state: "online", details:"Maquina Online", loc: { x:150, y:0 }, color: "green", brand:"BALLI",angle:0 },
+        { uid:"000005", state: "offline", details:"Maquina Offline", loc: { x:0, y:50 }, color: "red", brand:"WILLIAMS",angle:0 },
+        { uid:"000006", state: "online", details:"Maquina Online", loc: { x:0, y:100 }, color: "green", brand:"IGT",angle:0 },
+        { uid:"000007", state: "offline", details:"Maquina: Puerta Abierta", loc: { x:0, y:150 }, color: "yellow", brand:"BALLI",angle:0 },
+        { uid:"000008", state: "online", details:"Maquina Online", loc: { x:0, y:200 }, color: "green", brand:"WILLIAMS",angle:0 }
       ]
     }
 
@@ -151,7 +162,7 @@ export class DiagramComponent implements OnInit {
         color:arr.machines[i].color,
         angle:arr.machines[i].angle
       }
-      nodes.push(obj);
+      nodes.push(arr.machines[i]);
     }
     this.diagram.model.nodeDataArray = nodes;
 
@@ -162,8 +173,15 @@ export class DiagramComponent implements OnInit {
         selectable: false, pickable: false },
       $(go.Picture, "https://upload.wikimedia.org/wikipedia/commons/9/9a/Sample_Floorplan.jpg")
     ));
+
+
   }
   ngOnInit() {
     this.diagram.div = this.diagramRef.nativeElement;
+    this.events.subscribe("onSearch",(data) => this.onSearch(data));
+  }
+  public onSearch(data) {
+    this.setNode(data);
+    console.log("llega evento: " + data)
   }
 }
