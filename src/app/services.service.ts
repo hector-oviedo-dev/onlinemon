@@ -34,8 +34,7 @@ export class ServicesService {
     this.ws = null;
   }
   private handleMessageReceived(data) {
-    console.log("data " + data.data)
-    //this._events.publish('onmessage', data.data);
+    this.events.publish('onMachines', data.data);
   }
   private handleConnected(data) {
     console.log("connected")
@@ -57,6 +56,6 @@ export class ServicesService {
   }
   public sendMessage(msg) {
     console.log("sending " + msg)
-    this.ws.send(msg);
+    //this.ws.send(msg);
   }
 }

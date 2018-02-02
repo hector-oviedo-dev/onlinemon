@@ -1,18 +1,16 @@
-<div>
-  <header style="text-align:center;">
+<div layout="column" style="height: 300px;">
+  <div style="text-align:center;">
     <h3 style="text-align:center;">UID: {{data.uid}}</h3>
-  </header>
-  <section>
-    <mat-list>
-     <mat-list-item>
-       Estado: {{data.state}}
-     </mat-list-item>
-     <mat-list-item>
-       Marca: {{data.brand}}
-     </mat-list-item>
-     <mat-list-item>
-       Detalle: {{data.details}}
-     </mat-list-item>
-   </mat-list>
-  </section>
+  </div>
+
+  <div>
+      <mat-list>
+       <mat-list-item *ngFor="let detail of data.details">
+         {{detail.label}} : {{detail.value}}
+       </mat-list-item>
+     </mat-list>
+  </div>
+
+  <div>
+  </div>
 </div>

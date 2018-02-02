@@ -13,7 +13,7 @@ export class LeftSideComponent implements OnInit {
   @ViewChild("uid")
   private uid:ElementRef;
 
-  public toggle = { search:false, filters:false }
+  public toggle = { search:false, filter:false }
   public filters = [
     { label:"Marca", value:"brand",
       values:[{label:"IGT", value:"IGT"},{label:"WILLIAMS", value:"WILLIAMS"},{label:"BALLI", value:"BALLI"}]
@@ -29,7 +29,7 @@ export class LeftSideComponent implements OnInit {
     this.events = services.events;
   }
   ngOnInit() {
-    
+
   }
   public doSearch() {
     console.log("search")
