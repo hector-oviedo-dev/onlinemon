@@ -56,6 +56,6 @@ export class ServicesService {
   }
   public sendMessage(msg) {
     console.log("sending " + msg)
-    //this.ws.send(msg);
+    this.ws.send(msg);
   }
 }

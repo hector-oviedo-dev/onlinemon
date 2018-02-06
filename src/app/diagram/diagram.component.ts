@@ -38,10 +38,30 @@ export class DiagramComponent implements OnInit {
     //this.diagram.addDiagramListener("ObjectSingleClicked", (e) => this.onClick(e));
     //this.diagram.addDiagramListener("SelectionMoved", (e) => this.onDrop(e));
 
+    //Context Menu
+    this.diagram.contextMenu =
+      $(go.Adornment, "Vertical",
+      //Guardar Posicion
+      $("ContextMenuButton",
+              $(go.TextBlock, "Agregar Maquina"),
+              { click: (e, obj) => this.onAddMachine(e, obj) }),
+
+      //Alinear Horizontal
+      $("ContextMenuButton",
+              $(go.TextBlock, "Alinear Horizontalmente"),
+              { click: (e, obj) => this.onAlignHorizontal(e, obj) }),
+      //Alinear Vertical
+      $("ContextMenuButton",
+              $(go.TextBlock, "Alinear Verticalmente"),
+              { click: (e, obj) => this.onAlignVertical(e, obj) })
+
+      )
+
+
     this.diagram.nodeTemplate =
     $(go.Node,"Auto",
       {
-        //mouseOver: function (e, obj) { that.onDrop({ data:obj.part.Zd, loc:obj.part.location, r:obj.part.angle }); },
+        mouseOver: function (e, obj) { that.onSavePositionInstant(e, obj); },
         doubleClick: function (e, obj) { that.onClick(e, obj); }
       },
       //Fondo
@@ -110,8 +130,36 @@ export class DiagramComponent implements OnInit {
       new go.Binding("angle", "angle")
     );
     this.diagram.toolManager.rotatingTool.handleArchetype = $(go.Shape, "Circle", { width: 10, stroke: "green", fill: "blue" });
+  }
+  //Agregar Nueva Maquina
+  public onAddMachine(e, obj) {
+    let diagram = e.diagram;
+    let loc = diagram.toolManager.contextMenuTool.mouseDownPoint;
+    diagram.startTransaction('new node');
+    let data = { uid:"000001", label_state: "offline", loc: { x:loc.x, y:loc.y }, color: "red", angle:0 };
+    diagram.model.addNodeData(data);
+    let part = diagram.findPartForData(data);
+    part.location = diagram.toolManager.contextMenuTool.mouseDownPoint;
+    diagram.commitTransaction('new node');
+  }
+  //Guardar Posicion
+  public onSavePositionInstant(e, obj) {
+   let actualX = parseInt(obj.part.location.x);
+   let actualY = parseInt(obj.part.location.y);
+   let actualR = parseInt(obj.part.angle);
 
-    this.onMachines(JSON.stringify({maquinas:[]}));
+   let oldX = obj.part.Zd.loc.x;
+   let oldY = obj.part.Zd.loc.y;
+   let oldR = obj.part.Zd.angle;
+
+   if (actualX != oldX || actualY != oldY || actualR != oldR) {
+     obj.part.Zd.loc.x = actualX;
+     obj.part.Zd.loc.y = actualY;
+     obj.part.Zd.angle = actualR;
+     let msg = { uid:obj.part.Zd.uid, loc:{ x:actualX, y:actualY }, angle:actualR }
+
+     this.services.sendMessage(JSON.stringify(msg));
+   }
   }
   //Guardar Posicion
   public onSavePosition(e, obj) {
@@ -136,6 +184,7 @@ export class DiagramComponent implements OnInit {
   }
   //Ver Detalles
   public onDetails(e,obj) {
+    //this.events.publish("onPopup",)
     console.log("context clicked " + obj)
   }
   //Modificar
@@ -156,26 +205,27 @@ export class DiagramComponent implements OnInit {
   }
   public onClick(e, obj) {
     let data = obj.part.Zd;
-    let location = { x:obj.part.location.x, y:obj.part.location.y };
-    let rotation = obj.part.angle;
-
   }
-  public doSearch(uid) {
-    let found:boolean = false;
-    for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
-      let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
-      if (actualOBJ.uid == uid) {
-        let actualX = parseInt(actualOBJ.loc.x);
-        let actualY = parseInt(actualOBJ.loc.y);
+  public onAlignHorizontal(e, ob) {
+    let selection = this.diagram.selection.toArray();
+    let y = 0;
+    for (let i = 0; i < selection.length; i++) {
 
-        let rect = this.diagram.viewportBounds;
+      if (i == 0) y = selection[i].location.y;
 
-        let x = actualX - rect.width/2;
-        let y = actualY - rect.height/2;
+      (selection[i] as any).position = new go.Point(selection[i].location.x - this.objectwidth/2, y);
 
-        let point  = new go.Point(x,y)
-        this.diagram.position = point;
-      }
+    }
+  }
+  public onAlignVertical(e, ob) {
+    let selection = this.diagram.selection.toArray();
+    let x = 0;
+    for (let i = 0; i < selection.length; i++) {
+
+      if (i == 0) x = selection[i].location.x;
+
+      (selection[i] as any).position = new go.Point(x, selection[i].location.y - this.objectwidth/2);
+
     }
   }
 
@@ -195,8 +245,8 @@ export class DiagramComponent implements OnInit {
 
     const $ = go.GraphObject.make;
 
-    console.log("onMachines" + JSON.stringify(data.maquinas))
-
+    //console.log("onMachines" + JSON.stringify(data.maquinas))
+    /*
     data = {
       maquinas:[
         { uid:"000001", label_state: "online", loc: { x:0, y:0 }, color: "green", angle:30 },
@@ -209,10 +259,11 @@ export class DiagramComponent implements OnInit {
         { uid:"000008", label_state: "online", loc: { x:0, y:200 }, color: "green", angle:0 }
       ]
     }
-
-
+    */
     let nodes = [];
-    for (let i = 0; i < data.maquinas.length;i++) {
+    for (let j = 0; j < this.diagram.model.nodeDataArray.length; j++) nodes.push(this.diagram.model.nodeDataArray[j]);
+
+    for (let i = 0; i < data.maquinas.length; i++) {
       let obj = {
         uid:data.maquinas[i].uid,
         label_state:data.maquinas[i].label_state,
@@ -220,9 +271,21 @@ export class DiagramComponent implements OnInit {
         color:data.maquinas[i].color,
         angle:data.maquinas[i].angle
       }
-      nodes.push(data.maquinas[i]);
+
+      let node;
+      let valid:boolean = true;
+      for (let j = 0; j < this.diagram.model.nodeDataArray.length; j++) {
+        if ((this.diagram.model.nodeDataArray[j] as any).uid == data.maquinas[i].uid) {
+          node = this.diagram.model.nodeDataArray[j];
+          valid = false;
+        }
+      }
+      if (valid) this.addNode(obj, nodes)
+      else this.updateNode(obj, node)
     }
     this.diagram.model.nodeDataArray = nodes;
+
+    //for (let j = 0; j < this.diagram.model.nodeDataArray.length; j++) this.updateNode(this.diagram.model.nodeDataArray[j]);
 
     //background image
     this.diagram.add(
@@ -231,8 +294,15 @@ export class DiagramComponent implements OnInit {
         selectable: false, pickable: false },
       $(go.Picture, "https://upload.wikimedia.org/wikipedia/commons/9/9a/Sample_Floorplan.jpg")
     ));
-
-
+  }
+  public addNode(obj, nodes) {
+    nodes.push(obj);
+  }
+  public updateNode(obj, node) {
+    node.label_state = obj.label_state;
+    node.loc = obj.loc;
+    node.color = obj.color;
+    node.angle = obj.angle;
   }
   ngOnInit() {
     this.diagram.div = this.diagramRef.nativeElement;
@@ -242,5 +312,24 @@ export class DiagramComponent implements OnInit {
   public onSearch(data) {
     this.doSearch(data);
     console.log("llega evento: " + data)
+  }
+  //Buscar
+  public doSearch(uid) {
+    let found:boolean = false;
+    for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
+      let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
+      if (actualOBJ.uid == uid) {
+        let actualX = parseInt(actualOBJ.loc.x);
+        let actualY = parseInt(actualOBJ.loc.y);
+
+        let rect = this.diagram.viewportBounds;
+
+        let x = actualX - rect.width/2;
+        let y = actualY - rect.height/2;
+
+        let point  = new go.Point(x,y)
+        this.diagram.position = point;
+      }
+    }
   }
 }
