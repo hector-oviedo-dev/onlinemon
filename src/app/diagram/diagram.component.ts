@@ -329,7 +329,7 @@ export class DiagramComponent implements OnInit {
         color:data.maquinas[i].color,
         angle:data.maquinas[i].angle,
         area:data.maquinas[i].area,
-        ip:data.maquinas[i].ip+":"+data.maquinas[i].port,
+        ip:data.maquinas[i].ip+":"+data.maquinas[i].puerto,
       }
 
       let node;
