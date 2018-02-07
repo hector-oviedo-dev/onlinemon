@@ -4,7 +4,7 @@ import { EventsService } from 'angular4-events';
 @Injectable()
 export class ServicesService {
   private ws:WebSocket;
-  private WS_URL:string = "ws://10.10.2.50:8080";
+  private WS_URL:string = "ws://10.10.2.63:8080";
   constructor(public events:EventsService) {
 
   }
