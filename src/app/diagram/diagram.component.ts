@@ -27,16 +27,19 @@ export class DiagramComponent implements OnInit {
     this.diagram = new go.Diagram();
     this.diagram.initialContentAlignment = go.Spot.Center;
 
-    this.diagram.undoManager.isEnabled = true;
-    this.diagram.toolManager.hoverDelay = 100;
-    this.diagram.allowDrop = true;
+    this.diagram.maxSelectionCount = 1;
+    this.diagram.undoManager.isEnabled = false;
+    this.diagram.toolManager.hoverDelay = 1;
+    this.diagram.allowDrop = false;
     this.diagram.allowMove = true;
     this.diagram.allowCopy = false;
     this.diagram.allowDelete = false;
     this.diagram.allowInsert = false;
 
-    //this.diagram.addDiagramListener("ObjectSingleClicked", (e) => this.onClick(e));
-    //this.diagram.addDiagramListener("SelectionMoved", (e) => this.onDrop(e));
+    this.diagram.addDiagramListener("SelectionMoved", (e) => this.SelectionMoved(e));
+    this.diagram.addDiagramListener("PartRotated", (e) => this.PartRotated(e));
+    //this.diagram.addDiagramListener("ChangingSelection", (e) => console.log("ChangingSelection"));
+    this.diagram.addDiagramListener("ObjectSingleClicked", (e) => console.log("ObjectSingleClicked"));
 
     //Context Menu
     this.diagram.contextMenu =
@@ -61,7 +64,9 @@ export class DiagramComponent implements OnInit {
     this.diagram.nodeTemplate =
     $(go.Node,"Auto",
       {
-        mouseOver: function (e, obj) { that.onSavePositionInstant(e, obj); },
+        //mouseOver: function (e, obj) {console.log("mouseOver") },
+        mouseOver: function (e, obj) { that.onEnterFrame(e, obj); },
+        //mouseOver: function (e, obj) { that.onSavePositionInstant(e, obj); },
         doubleClick: function (e, obj) { that.onClick(e, obj); }
       },
       //Fondo
@@ -129,8 +134,50 @@ export class DiagramComponent implements OnInit {
       new go.Binding("location", "loc"), { locationSpot: go.Spot.Center, rotatable: true },
       new go.Binding("angle", "angle")
     );
-    this.diagram.toolManager.rotatingTool.handleArchetype = $(go.Shape, "Circle", { width: 10, stroke: "green", fill: "blue" });
+    let positionOBJ = new go.Point(-110,0);
+    this.diagram.toolManager.rotatingTool.handleArchetype = $(go.Shape, "Circle", {position:positionOBJ, width: 10, stroke: "green", fill: "blue" });
   }
+
+public onEnterFrame(e, obj) {
+  console.log(this.diagram.toolManager.draggingTool.draggedParts)
+}
+public SelectionMoved(e) {
+  let obj = this.diagram.selection.first() as any;
+  if (!obj) return;
+
+  let actualUID = obj.Zd.uid;
+  let actualX = parseInt(obj.location.x);
+  let actualY = parseInt(obj.location.y);
+  let actualR = parseInt(obj.angle);
+
+  obj.Zd.loc.x = actualX;
+  obj.Zd.loc.y = actualY;
+  obj.Zd.angle = actualR;
+
+  let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
+  this.services.sendMessage(JSON.stringify(msg));
+}
+public PartRotated(e) {
+  let obj = e.subject;
+  if (!obj) return;
+
+  let actualUID = obj.Zd.uid;
+  let actualX = parseInt(obj.location.x);
+  let actualY = parseInt(obj.location.y);
+  let actualR = parseInt(obj.angle);
+
+  obj.Zd.loc.x = actualX;
+  obj.Zd.loc.y = actualY;
+  obj.Zd.angle = actualR;
+
+  let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
+  this.services.sendMessage(JSON.stringify(msg));
+}
+//public mouseDragOver(e) { console.log("mouseDragOver: " + e) }
+
+
+
+
   //Agregar Nueva Maquina
   public onAddMachine(e, obj) {
     let diagram = e.diagram;
@@ -241,11 +288,12 @@ export class DiagramComponent implements OnInit {
     }
   }*/
   public onMachines(dataSTR) {
+    if (this.diagram.toolManager.draggingTool.draggedParts) return;
+
     let data = JSON.parse(dataSTR);
 
     const $ = go.GraphObject.make;
 
-    //console.log("onMachines" + JSON.stringify(data.maquinas))
     /*
     data = {
       maquinas:[
@@ -308,6 +356,9 @@ export class DiagramComponent implements OnInit {
     this.diagram.div = this.diagramRef.nativeElement;
     this.events.subscribe("onSearch",(data) => this.onSearch(data));
     this.events.subscribe("onMachines",(data) => this.onMachines(data));
+
+
+    this.onMachines('{"maquinas":[]}')
   }
   public onSearch(data) {
     this.doSearch(data);
