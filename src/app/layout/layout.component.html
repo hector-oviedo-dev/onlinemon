@@ -1,17 +1,9 @@
 <mat-tab-group class="demo-tab-group">
-  <mat-tab label="Piso 1">
-    <div class="demo-tab-content">
-      <app-diagram></app-diagram>
-    </div>
-  </mat-tab>
-  <mat-tab label="Piso 2">
-    <div class="demo-tab-content">
-      
-    </div>
-  </mat-tab>
-  <mat-tab label="Piso 3">
-    <div class="demo-tab-content">
 
+  <mat-tab *ngFor="let area of areas;" [label]="area.label">
+    <div class="demo-tab-content">
+      <app-diagram [area]="area.area"></app-diagram>
     </div>
   </mat-tab>
+
 </mat-tab-group>

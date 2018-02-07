@@ -17,9 +17,21 @@ export class DiagramComponent implements OnInit {
   public objectwidth = 50;
 
   private events: EventsService;
+
+  @Input()
+  public area:string = "";
+
+  public activated:boolean = false;
   constructor(private services:ServicesService) {
-    services.connect();
     this.events = services.events;
+  }
+  ngOnInit() {
+
+  }
+  public start() {
+    this.activated = true;
+
+    this.services.connect();
 
     const $ = go.GraphObject.make;
     const that = this;
@@ -38,8 +50,6 @@ export class DiagramComponent implements OnInit {
 
     this.diagram.addDiagramListener("SelectionMoved", (e) => this.SelectionMoved(e));
     this.diagram.addDiagramListener("PartRotated", (e) => this.PartRotated(e));
-    //this.diagram.addDiagramListener("ChangingSelection", (e) => console.log("ChangingSelection"));
-    this.diagram.addDiagramListener("ObjectSingleClicked", (e) => console.log("ObjectSingleClicked"));
 
     //Context Menu
     this.diagram.contextMenu =
@@ -65,7 +75,6 @@ export class DiagramComponent implements OnInit {
     $(go.Node,"Auto",
       {
         //mouseOver: function (e, obj) {console.log("mouseOver") },
-        mouseOver: function (e, obj) { that.onEnterFrame(e, obj); },
         //mouseOver: function (e, obj) { that.onSavePositionInstant(e, obj); },
         doubleClick: function (e, obj) { that.onClick(e, obj); }
       },
@@ -89,7 +98,8 @@ export class DiagramComponent implements OnInit {
           $(go.Shape, { fill: "lightyellow" }),
           $(go.Panel, "Vertical",
             $(go.TextBlock, { margin: 3 }, new go.Binding("text", "uid")),
-            $(go.TextBlock, { margin: 3 }, new go.Binding("text", "label_state"))
+            $(go.TextBlock, { margin: 3 }, new go.Binding("text", "label_state")),
+            $(go.TextBlock, { margin: 3 }, new go.Binding("text", "ip")),
           )
         )
       },
@@ -136,48 +146,46 @@ export class DiagramComponent implements OnInit {
     );
     let positionOBJ = new go.Point(-110,0);
     this.diagram.toolManager.rotatingTool.handleArchetype = $(go.Shape, "Circle", {position:positionOBJ, width: 10, stroke: "green", fill: "blue" });
+
+    this.diagram.div = this.diagramRef.nativeElement;
+    this.events.subscribe("onSearch",(data) => this.onSearch(data));
+    this.events.subscribe("onMachines",(data) => this.onMachines(data));
+
+
+    this.onMachines('{"maquinas":[]}')
   }
+  public SelectionMoved(e) {
+    let obj = this.diagram.selection.first() as any;
+    if (!obj) return;
 
-public onEnterFrame(e, obj) {
-  console.log(this.diagram.toolManager.draggingTool.draggedParts)
-}
-public SelectionMoved(e) {
-  let obj = this.diagram.selection.first() as any;
-  if (!obj) return;
+    let actualUID = obj.Zd.uid;
+    let actualX = parseInt(obj.location.x);
+    let actualY = parseInt(obj.location.y);
+    let actualR = parseInt(obj.angle);
 
-  let actualUID = obj.Zd.uid;
-  let actualX = parseInt(obj.location.x);
-  let actualY = parseInt(obj.location.y);
-  let actualR = parseInt(obj.angle);
+    obj.Zd.loc.x = actualX;
+    obj.Zd.loc.y = actualY;
+    obj.Zd.angle = actualR;
 
-  obj.Zd.loc.x = actualX;
-  obj.Zd.loc.y = actualY;
-  obj.Zd.angle = actualR;
+    let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
+    this.services.sendMessage(JSON.stringify(msg));
+  }
+  public PartRotated(e) {
+    let obj = e.subject;
+    if (!obj) return;
 
-  let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
-  this.services.sendMessage(JSON.stringify(msg));
-}
-public PartRotated(e) {
-  let obj = e.subject;
-  if (!obj) return;
+    let actualUID = obj.Zd.uid;
+    let actualX = parseInt(obj.location.x);
+    let actualY = parseInt(obj.location.y);
+    let actualR = parseInt(obj.angle);
 
-  let actualUID = obj.Zd.uid;
-  let actualX = parseInt(obj.location.x);
-  let actualY = parseInt(obj.location.y);
-  let actualR = parseInt(obj.angle);
+    obj.Zd.loc.x = actualX;
+    obj.Zd.loc.y = actualY;
+    obj.Zd.angle = actualR;
 
-  obj.Zd.loc.x = actualX;
-  obj.Zd.loc.y = actualY;
-  obj.Zd.angle = actualR;
-
-  let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
-  this.services.sendMessage(JSON.stringify(msg));
-}
-//public mouseDragOver(e) { console.log("mouseDragOver: " + e) }
-
-
-
-
+    let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
+    this.services.sendMessage(JSON.stringify(msg));
+  }
   //Agregar Nueva Maquina
   public onAddMachine(e, obj) {
     let diagram = e.diagram;
@@ -312,12 +320,16 @@ public PartRotated(e) {
     for (let j = 0; j < this.diagram.model.nodeDataArray.length; j++) nodes.push(this.diagram.model.nodeDataArray[j]);
 
     for (let i = 0; i < data.maquinas.length; i++) {
+      console.log("area: " +  this.area + " obj: " + JSON.stringify(data.maquinas[i]))
+
       let obj = {
         uid:data.maquinas[i].uid,
         label_state:data.maquinas[i].label_state,
         loc: new go.Point(data.maquinas[i].loc.x , data.maquinas[i].loc.y),
         color:data.maquinas[i].color,
-        angle:data.maquinas[i].angle
+        angle:data.maquinas[i].angle,
+        area:data.maquinas[i].area,
+        ip:data.maquinas[i].ip+":"+data.maquinas[i].port,
       }
 
       let node;
@@ -328,8 +340,10 @@ public PartRotated(e) {
           valid = false;
         }
       }
-      if (valid) this.addNode(obj, nodes)
-      else this.updateNode(obj, node)
+      if (obj.area == this.area) {
+        if (valid) this.addNode(obj, nodes)
+        else this.updateNode(obj, node)
+      }
     }
     this.diagram.model.nodeDataArray = nodes;
 
@@ -351,14 +365,6 @@ public PartRotated(e) {
     node.loc = obj.loc;
     node.color = obj.color;
     node.angle = obj.angle;
-  }
-  ngOnInit() {
-    this.diagram.div = this.diagramRef.nativeElement;
-    this.events.subscribe("onSearch",(data) => this.onSearch(data));
-    this.events.subscribe("onMachines",(data) => this.onMachines(data));
-
-
-    this.onMachines('{"maquinas":[]}')
   }
   public onSearch(data) {
     this.doSearch(data);

@@ -10,8 +10,13 @@ import { EventsService } from 'angular4-events';
 export class LayoutComponent implements OnInit {
   private events: EventsService;
 
+  public areas = [];
+
   constructor(private services:ServicesService) {
       this.events = services.events;
+
+      this.areas.push({label:"Piso A",area:"a"});
+      this.areas.push({label:"Piso B",area:"b"});
   }
 
   ngOnInit() {
