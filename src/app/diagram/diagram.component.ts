@@ -107,11 +107,6 @@ export class DiagramComponent implements OnInit {
       {
         contextMenu:
           $(go.Adornment, "Vertical",
-          //Guardar Posicion
-          $("ContextMenuButton",
-            $(go.TextBlock, "Salvar Posicion"),
-            { click: (e, obj) => this.onSavePosition(e, obj) }
-            ),
           //Ver Detalles
           $("ContextMenuButton",
             $(go.TextBlock, "Ver Detalles"),
@@ -329,7 +324,7 @@ export class DiagramComponent implements OnInit {
         color:data.maquinas[i].color,
         angle:data.maquinas[i].angle,
         area:data.maquinas[i].area,
-        ip:data.maquinas[i].ip+":"+data.maquinas[i].puerto,
+        ip:data.maquinas[i].ip+":"+data.maquinas[i].port,
       }
 
       let node;
