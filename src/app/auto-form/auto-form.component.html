@@ -1,0 +1,20 @@
+<table>
+
+  <tr>
+  <td>
+        <h3>{{_label_title}}</h3>
+  </td>
+</tr>
+  <tr>
+  <td>
+    <ng-template #container>
+    </ng-template>
+  </td>
+</tr>
+
+  <tr>
+  <td>
+    <button mat-button [disabled]="!_valid" (click)="submitClick()">{{_label_submit}}</button>
+  </td>
+</tr>
+</table>

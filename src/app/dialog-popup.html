@@ -1,16 +1,8 @@
-<div layout="column" style="height: 300px;">
-  <div style="text-align:center;">
+<div style="height: 300px;">
+
     <h3 style="text-align:center;">UID: {{data.uid}}</h3>
-  </div>
 
-  <div>
-      <mat-list>
-       <mat-list-item *ngFor="let detail of data.details">
-         {{detail.label}} : {{detail.value}}
-       </mat-list-item>
-     </mat-list>
-  </div>
 
-  <div>
-  </div>
+  <app-container>
+  </app-container>
 </div>

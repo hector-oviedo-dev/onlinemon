@@ -1,0 +1,27 @@
+auto-grid {
+
+}
+.gridClass {
+  border: solid 1px grey;
+
+}
+.gridHeaderRow {
+
+}
+.gridHeaderCol {
+  font-weight: bold;
+   //background-color:lightgrey;
+}
+.gridCol {
+  border: solid 1px grey;
+    border-top-style: none;
+    border-bottom-style: none;
+    border-left-style: none;
+    border-right-style: none;
+}
+.gridRowEven {
+
+}
+.gridRowOdd {
+    background-color:lightblue;
+}

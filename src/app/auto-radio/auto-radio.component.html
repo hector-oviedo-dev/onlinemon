@@ -1,0 +1,28 @@
+<table [hidden]="_hidden" [ngClass]="[(_valid)?'formBoxValid':'formBoxInalid']">
+  <tr>
+    <td>
+      <label>
+        {{_label}}
+      </label>
+  </td>
+    <td>
+      <button mat-button positionV="bottom" arrow class="formHelpButton" float-right>?</button>
+    </td>
+  </tr>
+  <tr>
+    <table class="formTextLabel">
+
+      <tr *ngFor="let option of _options;let i = index;">
+        <label>{{option.label}}</label>
+        <mat-radio-button [(value)]="option.value" [(checked)]="option.check" [disabled]="!_enabled" (click)="onChange(i)"></mat-radio-button>
+      </tr>
+
+    </table>
+  </tr>
+  <tr>
+    <td>
+      <label color="danger" *ngIf="(!_valid && _txt_required != undefined)" stacked  class="formErrorText">* {{_txt_required}}</label>
+    </td>
+  </tr>
+</table>
+<br>

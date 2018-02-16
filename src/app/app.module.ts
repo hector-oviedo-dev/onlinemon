@@ -1,8 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormGroup, FormControl,ReactiveFormsModule } from '@angular/forms';
 import { EventsModule } from 'angular4-events';
+import { HttpClientModule } from '@angular/common/http';
 
 import { FlexLayoutModule } from "@angular/flex-layout";
 import {
@@ -38,6 +39,9 @@ import {
   MatToolbarModule,
   MatTooltipModule,
   MatStepperModule,
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
 } from '@angular/material';
 
 import { AgGridModule } from "ag-grid-angular/main";
@@ -54,6 +58,18 @@ import { FooterComponent } from './footer/footer.component';
 import { DiagramComponent } from './diagram/diagram.component';
 
 import { DialogPopup } from './app.component';
+import { AutoCheckComponent } from './auto-check/auto-check.component';
+import { AutoChecklistComponent } from './auto-checklist/auto-checklist.component';
+import { AutoDateComponent } from './auto-date/auto-date.component';
+import { AutoFormComponent } from './auto-form/auto-form.component';
+import { AutoGridComponent } from './auto-grid/auto-grid.component';
+import { AutoInputComponent } from './auto-input/auto-input.component';
+import { AutoRadioComponent } from './auto-radio/auto-radio.component';
+import { AutoSelectComponent } from './auto-select/auto-select.component';
+import { AutoTextareaComponent } from './auto-textarea/auto-textarea.component';
+import { ContainerComponent } from './container/container.component';
+import { DynamicComponent } from './dynamic/dynamic.component';
+import { ErrorComponent } from './error/error.component';
 
 
 @NgModule({
@@ -65,13 +81,40 @@ import { DialogPopup } from './app.component';
     RightSideComponent,
     FooterComponent,
     DiagramComponent,
-    DialogPopup
+    DialogPopup,
+    AutoCheckComponent,
+    AutoChecklistComponent,
+    AutoDateComponent,
+    AutoFormComponent,
+    AutoGridComponent,
+    AutoInputComponent,
+    AutoRadioComponent,
+    AutoSelectComponent,
+    AutoTextareaComponent,
+    ContainerComponent,
+    DynamicComponent,
+    ErrorComponent
   ],
-  entryComponents: [DialogPopup],
+  entryComponents: [
+    DialogPopup,
+    AutoCheckComponent,
+    AutoChecklistComponent,
+    AutoDateComponent,
+    AutoFormComponent,
+    AutoGridComponent,
+    AutoInputComponent,
+    AutoRadioComponent,
+    AutoSelectComponent,
+    AutoTextareaComponent,
+    ContainerComponent,
+    DynamicComponent,
+  ],
   imports: [
+    HttpClientModule,
     EventsModule.forRoot(),
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     FlexLayoutModule,
 
@@ -110,7 +153,12 @@ import { DialogPopup } from './app.component';
 
     AgGridModule.withComponents([])
   ],
-  providers: [ ServicesService ],
+  providers: [
+     ServicesService,
+     { provide: MAT_DIALOG_DATA, useValue: {} },
+     { provide: MatDialogRef, useValue: {} }
+    ],
   bootstrap: [AppComponent]
 })
+
 export class AppModule { }

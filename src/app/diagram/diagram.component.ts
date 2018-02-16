@@ -9,7 +9,7 @@ import * as go from 'gojs';
   styleUrls: ['./diagram.component.css']
 })
 export class DiagramComponent implements OnInit {
-  private diagram: go.Diagram = new go.Diagram();
+  public diagram: go.Diagram = new go.Diagram();
 
   @ViewChild('diagramDiv')
   private diagramRef: ElementRef;
@@ -22,16 +22,21 @@ export class DiagramComponent implements OnInit {
   public area:string = "";
 
   public activated:boolean = false;
+
+  private started:boolean = false;
   constructor(private services:ServicesService) {
     this.events = services.events;
   }
   ngOnInit() {
+    this.start();
+  }
+  public doStart() {
+    //if (!this.started) this.start();
 
+    this.diagram.requestUpdate();
   }
   public start() {
     this.activated = true;
-
-    this.services.connect();
 
     const $ = go.GraphObject.make;
     const that = this;
@@ -39,7 +44,7 @@ export class DiagramComponent implements OnInit {
     this.diagram = new go.Diagram();
     this.diagram.initialContentAlignment = go.Spot.Center;
 
-    this.diagram.maxSelectionCount = 1;
+    this.diagram.maxSelectionCount = 999;
     this.diagram.undoManager.isEnabled = false;
     this.diagram.toolManager.hoverDelay = 1;
     this.diagram.allowDrop = false;
@@ -147,7 +152,7 @@ export class DiagramComponent implements OnInit {
     this.events.subscribe("onMachines",(data) => this.onMachines(data));
 
 
-    this.onMachines('{"maquinas":[]}')
+    this.onMachines('{"maquinas":[]}');
   }
   public SelectionMoved(e) {
     let obj = this.diagram.selection.first() as any;
@@ -191,6 +196,8 @@ export class DiagramComponent implements OnInit {
     let part = diagram.findPartForData(data);
     part.location = diagram.toolManager.contextMenuTool.mouseDownPoint;
     diagram.commitTransaction('new node');
+
+    this.diagram.requestUpdate();
   }
   //Guardar Posicion
   public onSavePositionInstant(e, obj) {
@@ -234,7 +241,15 @@ export class DiagramComponent implements OnInit {
   }
   //Ver Detalles
   public onDetails(e,obj) {
-    //this.events.publish("onPopup",)
+    let details = [
+      {
+        label:"Estado",
+        value:"Online"
+      }
+    ];
+
+    let data = {uid:"000",details:details};
+    this.events.publish("onPopup",data)
     console.log("context clicked " + obj)
   }
   //Modificar

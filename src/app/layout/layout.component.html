@@ -1,9 +1,11 @@
-<mat-tab-group class="demo-tab-group">
+<div style="height:100%">
 
-  <mat-tab *ngFor="let area of areas;" [label]="area.label">
-    <div class="demo-tab-content">
-      <app-diagram [area]="area.area"></app-diagram>
-    </div>
+<mat-tab-group (focusChange)="onFocusChange($event)">
+
+  <mat-tab *ngFor="let area of areas;let last = last" [label]="area.label" [attr.ready]="last ? false : true">
+      <app-diagram [area]="area.area" #diagrams></app-diagram>
   </mat-tab>
 
 </mat-tab-group>
+
+</div>

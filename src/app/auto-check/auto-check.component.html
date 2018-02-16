@@ -1,0 +1,12 @@
+<table [hidden]="_hidden" class="formBoxValid">
+    <tr class="formTextLabel">
+      <td>
+        <label *ngIf="_label != undefined">{{_label}}</label>
+        <mat-checkbox [(ngModel)]="_value" [disabled]="!_enabled"></mat-checkbox>
+      </td>
+      <td>
+        <button mat-button positionV="bottom" arrow class="formHelpButton" float-right>?</button>
+      </td>
+    </tr>
+  </table>
+<br>

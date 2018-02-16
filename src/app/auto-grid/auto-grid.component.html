@@ -1,0 +1,28 @@
+<mat-grid-list cols="3" class="gridClass">
+  <mat-grid-tile class="gridHeaderRow">
+    <mat-list-item class="gridHeaderCol" *ngFor="let title of _titles;" text-center>
+
+      <mat-list-item>
+        <span>{{title.label}}</span>
+        <button mat-button clear outline>expand</button>
+      </mat-list-item>
+
+    </mat-list-item>
+  </mat-grid-tile>
+  <mat-grid-tile class="gridRow" *ngFor="let row of _rows;let odd = odd;" [ngClass]="(odd)?'gridRowOdd':gridRowEven">
+    <mat-list-item *ngFor="let col of row.cols;" class="gridCol" text-center>
+      <label>{{col.label}}</label>
+      <button mat-button *ngIf="col.type == 'button'">{{_label_cancel}}</button>
+    </mat-list-item>
+  </mat-grid-tile>
+  <mat-grid-tile class="gridRow">
+    <mat-list-item text-center>
+      <button mat-button><</button>
+    </mat-list-item>
+    <mat-list-item>
+    </mat-list-item>
+    <mat-list-item text-center>
+      <button mat-button>></button>
+    </mat-list-item>
+  </mat-grid-tile>
+</mat-grid-list>

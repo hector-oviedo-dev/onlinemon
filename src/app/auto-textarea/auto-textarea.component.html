@@ -1,0 +1,24 @@
+
+<form [formGroup]="_form">
+<table [hidden]="_hidden" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formBoxValid':'formBoxInalid'):'formBoxDisabled'">
+  <tr>
+    <td *ngIf="_label != undefined" class="formTextLabel">
+      <label>{{_label}}</label>
+    </td>
+    <td>
+      <button mat-button positionV="bottom" arrow class="formHelpButton" float-right>?</button>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <textarea matInput formControlName="data" placeholder="{{_placeholder}}" maxlength="{{_max}}" [ngModel]="_value" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formTextValid':'formTextInalid'):'formTextDisabled'" (keyup)="onChange($event)"></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <label color="danger" *ngIf="(!_form.controls['data'].valid && _txt_required != undefined)" stacked  class="formErrorText">* {{_txt_required}}</label>
+    </td>
+  </tr>
+</table>
+<br>
+</form>

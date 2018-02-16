@@ -16,12 +16,13 @@ export class AppComponent {
   constructor(private services:ServicesService, public dialog: MatDialog) {
     this.events = services.events;
     this.events.subscribe("onPopup", (data) => this.onPopup(data));
+
+    this.services.connect();
   }
   public onPopup(data) {
-      //(this.modalRef as any).open();
       console.log(data)
       let dialogRef = this.dialog.open(DialogPopup, {
-      width: '500px',
+      width: '700px',
       data: data.data
     });
     }

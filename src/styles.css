@@ -1,2 +1,44 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+.formBoxValid {
+  min-width:400px;
+  border-radius: 5px;
+  border: 1px solid #488aff;
+}
+.formBoxInalid {
+  min-width:400px;
+  border-radius: 5px;
+  border: 1px solid #f53d3d;
+}
+.formBoxDisabled {
+  min-width:400px;
+  border-radius: 5px;
+  border: 1px solid #cccccc;
+}
+.formTextValid {
+  border: 1px solid #488aff;
+}
+.formTextInalid {
+  border: 1px solid #f53d3d;
+}
+.formHelpButton {
+  right: 0;
+  width:25px;
+  height:25px;
+}
+
+.formTitleText {
+
+}
+.formErrorText {
+
+}
