@@ -18,17 +18,14 @@ export class AppComponent {
     this.events.subscribe("onPopup", (data) => this.onPopup(data));
 
     this.services.connect();
-
-    //this.onPopup();
   }
   public onPopup(data) {
-      console.log(data)
-      let dialogRef = this.dialog.open(DialogPopup, {
+    let dialogRef = this.dialog.open(DialogPopup, {
       width: '90%',
       height:'90%',
-      data: data.data
+      data: data
     });
-    }
+  }
 }
 
 @Component({

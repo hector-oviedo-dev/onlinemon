@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { ServicesService } from '../services.service';
 
 @Component({
   selector: 'app-detail',
@@ -6,22 +7,47 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./detail.component.css']
 })
 export class DetailComponent implements OnInit {
+  @Input()
+  public data:any;
+
   public sides = [];
   public details = [];
-  constructor() {
+  constructor(private services:ServicesService) {
+
+  }
+  private onServiceResult(data) {
+    let res = data.json;
+
+    this.sides = res.info;
+    this.details = res.tabs;
+  }
+
+  ngOnInit() {
+    console.log("init")
+    this.services.doGet(this.data.service,"?data="+this.data.data).subscribe(
+        res => { this.onServiceResult(res); },
+        err => {
+          let data = this.createExample();
+          console.log("MESSAGE 404 Server Address " + JSON.stringify(data));
+          this.onServiceResult(data);
+        }
+      );
+  }
+  private createExample() {
+    let sides = [];
+    let details = [];
+
 
     //CONTENIDO IZQUIERDA
     //LISTA DE 'ROWS'
-    this.sides.push(
+    sides.push(
       {
         cols:[
           { label:"UID:", width:"33%" },
           { label:"MARCA:", width:"33%" },
           { label:"VC", width:"33%" },
         ]
-      }
-    );
-    this.sides.push(
+      },
       {
         cols:[
           { label:"000331", width:"33%", border:"1px solid gray", color:"#ffe4b5" },
@@ -325,48 +351,46 @@ export class DetailComponent implements OnInit {
       ]
 
     ///TABS
-    this.details.push(
-    {
-      label:"Contadores",
-      //CONTENIDO TAB 1
-      data:JSON.stringify(dataCont),
-    },
-    {
-      label:"Billetero",
-      //CONTENIDO TAB 2
-      data:JSON.stringify(dataBill),
-    },
-    {
-      label:"Pagos Manuales",
-      //CONTENIDO TAB 3
-      data:JSON.stringify(dataCont),
-    },
-    {
-      label:"Eventos",
-      //CONTENIDO TAB 4
-      data:JSON.stringify(dataCont),
-    },
-    {
-      label:"Producido",
-      //CONTENIDO TAB 5
-      data:JSON.stringify(dataProd),
-    },
-    {
-      label:"Conexion",
-      //CONTENIDO TAB 6
-      data:JSON.stringify(dataCon),
-    },
-    {
-      label:"EXT",
-      //CONTENIDO TAB 7
-      data:JSON.stringify(dataEXT),
-    },
-    )
+    details.push(
+      {
+        label:"Contadores",
+        //CONTENIDO TAB 1
+        data:JSON.stringify(dataCont),
+      },
+      {
+        label:"Billetero",
+        //CONTENIDO TAB 2
+        data:JSON.stringify(dataBill),
+      },
+      {
+        label:"Pagos Manuales",
+        //CONTENIDO TAB 3
+        data:[],
+      },
+      {
+        label:"Eventos",
+        //CONTENIDO TAB 4
+        data:[],
+      },
+      {
+        label:"Producido",
+        //CONTENIDO TAB 5
+        data:JSON.stringify(dataProd),
+      },
+      {
+        label:"Conexion",
+        //CONTENIDO TAB 6
+        data:JSON.stringify(dataCon),
+      },
+      {
+        label:"EXT",
+        //CONTENIDO TAB 7
+        data:JSON.stringify(dataEXT),
+      },
+    );
 
-  }
-
-
-  ngOnInit() {
+    let result = {json:{info:sides,tabs:details}}
+    return result;
   }
 
 }

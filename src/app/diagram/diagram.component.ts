@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { ServicesService } from '../services.service';
 import { EventsService } from 'angular4-events';
 import * as go from 'gojs';
@@ -30,6 +30,9 @@ export class DiagramComponent implements OnInit {
   ngOnInit() {
     this.start();
   }
+  @HostListener('change') ngOnChanges() {
+       console.log('test');
+   }
   public doStart() {
     //if (!this.started) this.start();
 
@@ -79,7 +82,9 @@ export class DiagramComponent implements OnInit {
     this.diagram.nodeTemplate =
     $(go.Node,"Auto",
       {
-        doubleClick: function (e, obj) { that.onClick(e, obj); }
+        selectionAdorned: false,
+        selectionChanged: function (obj) { that.onSelectionChanged(obj); },
+        doubleClick: function (e, obj) { that.onClick(e, obj); },
       },
       //Fondo
       $(go.Shape, "Rectangle",
@@ -87,13 +92,15 @@ export class DiagramComponent implements OnInit {
           stroke:null,
           fill:null,
           width:50,
-          height:90,
+          height:130,
         },
       ),
       //Fondo
       $(go.Shape, "Rectangle",
         new go.Binding("fill", "color"),
         {
+          name:"bg",
+          stroke:"gray",
           width:this.objectwidth,
           height:this.objectwidth,
         },
@@ -106,16 +113,16 @@ export class DiagramComponent implements OnInit {
       $(go.Picture,
         {
           source: "assets/chair.png",
-          width:15,
-          height:15,
-          margin: new go.Margin(75,0,0,0),
+          width:35,
+          height:35,
+          margin: new go.Margin(90,0,0,0),
         }
       ),
       //ToolTip
       {
         toolTip:
           $(go.Adornment, "Auto",
-          $(go.Shape, { fill: "lightyellow" }),
+          $(go.Shape, { fill: "darkgray" }),
           $(go.Panel, "Vertical",
             $(go.TextBlock, { margin: 3 }, new go.Binding("text", "uid")),
             $(go.TextBlock, { margin: 3 }, new go.Binding("text", "label_state")),
@@ -162,6 +169,15 @@ export class DiagramComponent implements OnInit {
 
     this.onMachines('{"maquinas":[]}');
   }
+  public onSelectionChanged(obj) {
+    var bg = obj.findObject("bg");
+    if (bg !== null) {
+      if (obj.isSelected)
+        bg.stroke = "blue";
+      else
+        bg.stroke = "gray";
+    }
+  }
   public SelectionMoved(e) {
     let obj = this.diagram.selection.first() as any;
     if (!obj) return;
@@ -196,6 +212,9 @@ export class DiagramComponent implements OnInit {
   }
   //Agregar Nueva Maquina
   public onAddMachine(e, obj) {
+    let data = { service:"onAddMachine",data:"" };
+    this.events.publish("onPopup", data);
+    /*
     let diagram = e.diagram;
     let loc = diagram.toolManager.contextMenuTool.mouseDownPoint;
     diagram.startTransaction('new node');
@@ -205,7 +224,7 @@ export class DiagramComponent implements OnInit {
     part.location = diagram.toolManager.contextMenuTool.mouseDownPoint;
     diagram.commitTransaction('new node');
 
-    this.diagram.requestUpdate();
+    this.diagram.requestUpdate();*/
   }
   //Guardar Posicion
   public onSavePositionInstant(e, obj) {
@@ -249,26 +268,26 @@ export class DiagramComponent implements OnInit {
   }
   //Ver Detalles
   public onDetail(e,obj) {
-    let data = { uid:obj.part.Zd.uid, service:"onDetail" };
+    let data = { data:obj.part.Zd.uid, service:"onDetail" };
     this.events.publish("onPopup", data);
   }
   //Modificar
   public onOnline(e,obj) {
-    let data = { uid:obj.part.Zd.uid, service:"onOnline" };
+    let data = { data:obj.part.Zd.uid, service:"onOnline" };
     this.events.publish("onPopup", data);
   }
   //Online Programado
   public onProgOffline(e,obj) {
-    let data = { uid:obj.part.Zd.uid, service:"onOffline" };
+    let data = { data:obj.part.Zd.uid, service:"onOffline" };
     this.events.publish("onPopup", data);
   }
   //Online Programado
   public onBaja(e,obj) {
-    let data = { uid:obj.part.Zd.uid, service:"onBaja" };
+    let data = { data:obj.part.Zd.uid, service:"onBaja" };
     this.events.publish("onPopup", data);
   }
   public onClick(e, obj) {
-    let data = { uid:obj.part.Zd.uid, service:"onDetail" };
+    let data = { data:obj.part.Zd.uid, service:"onDetail" };
     this.events.publish("onPopup", data);
   }
   public onAlignHorizontal(e, ob) {
