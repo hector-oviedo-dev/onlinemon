@@ -79,10 +79,17 @@ export class DiagramComponent implements OnInit {
     this.diagram.nodeTemplate =
     $(go.Node,"Auto",
       {
-        //mouseOver: function (e, obj) {console.log("mouseOver") },
-        //mouseOver: function (e, obj) { that.onSavePositionInstant(e, obj); },
         doubleClick: function (e, obj) { that.onClick(e, obj); }
       },
+      //Fondo
+      $(go.Shape, "Rectangle",
+        {
+          stroke:null,
+          fill:null,
+          width:50,
+          height:90,
+        },
+      ),
       //Fondo
       $(go.Shape, "Rectangle",
         new go.Binding("fill", "color"),
@@ -90,11 +97,19 @@ export class DiagramComponent implements OnInit {
           width:this.objectwidth,
           height:this.objectwidth,
         },
-
       ),
       //Texto con UID
       $(go.TextBlock, { margin: 2 },
         new go.Binding("text", "uid"),
+      ),
+      //Silla
+      $(go.Picture,
+        {
+          source: "assets/chair.png",
+          width:15,
+          height:15,
+          margin: new go.Margin(75,0,0,0),
+        }
       ),
       //ToolTip
       {
@@ -114,25 +129,18 @@ export class DiagramComponent implements OnInit {
           $(go.Adornment, "Vertical",
           //Ver Detalles
           $("ContextMenuButton",
-            $(go.TextBlock, "Ver Detalles"),
-            { click: (e, obj) => this.onDetails(e, obj) }
+            $(go.TextBlock, "Ver Detalle"),
+            { click: (e, obj) => this.onDetail(e, obj) }
             ),
-          //SPACE
-          $("ContextMenuButton", $(go.TextBlock, "-") ),
           //Modificar
           $("ContextMenuButton",
-            $(go.TextBlock, "Modificar"),
-            { click: (e, obj) => this.onModify(e, obj) }
-            ),
-          //Online Programado
-          $("ContextMenuButton",
-            $(go.TextBlock, "Online Programado"),
-            { click: (e, obj) => this.onProgOffline(e, obj) }
+            $(go.TextBlock, "Online"),
+            { click: (e, obj) => this.onOnline(e, obj) }
             ),
           //Offline Programado
           $("ContextMenuButton",
             $(go.TextBlock, "Offline Programado"),
-            { click: (e, obj) => this.onProgOnline(e, obj) }
+            { click: (e, obj) => this.onProgOffline(e, obj) }
             ),
           //Dar de Baja
           $("ContextMenuButton",
@@ -144,7 +152,7 @@ export class DiagramComponent implements OnInit {
       new go.Binding("location", "loc"), { locationSpot: go.Spot.Center, rotatable: true },
       new go.Binding("angle", "angle")
     );
-    let positionOBJ = new go.Point(-110,0);
+    let positionOBJ = new go.Point(-100,0);
     this.diagram.toolManager.rotatingTool.handleArchetype = $(go.Shape, "Circle", {position:positionOBJ, width: 10, stroke: "green", fill: "blue" });
 
     this.diagram.div = this.diagramRef.nativeElement;
@@ -240,36 +248,28 @@ export class DiagramComponent implements OnInit {
     }
   }
   //Ver Detalles
-  public onDetails(e,obj) {
-    let details = [
-      {
-        label:"Estado",
-        value:"Online"
-      }
-    ];
-
-    let data = {uid:"000",details:details};
-    this.events.publish("onPopup",data)
-    console.log("context clicked " + obj)
+  public onDetail(e,obj) {
+    let data = { uid:obj.part.Zd.uid, service:"onDetail" };
+    this.events.publish("onPopup", data);
   }
   //Modificar
-  public onModify(e,obj) {
-    console.log("context clicked " + obj)
-  }
-  //Online Programado
-  public onProgOnline(e,obj) {
-
+  public onOnline(e,obj) {
+    let data = { uid:obj.part.Zd.uid, service:"onOnline" };
+    this.events.publish("onPopup", data);
   }
   //Online Programado
   public onProgOffline(e,obj) {
-
+    let data = { uid:obj.part.Zd.uid, service:"onOffline" };
+    this.events.publish("onPopup", data);
   }
   //Online Programado
   public onBaja(e,obj) {
-
+    let data = { uid:obj.part.Zd.uid, service:"onBaja" };
+    this.events.publish("onPopup", data);
   }
   public onClick(e, obj) {
-    let data = obj.part.Zd;
+    let data = { uid:obj.part.Zd.uid, service:"onDetail" };
+    this.events.publish("onPopup", data);
   }
   public onAlignHorizontal(e, ob) {
     let selection = this.diagram.selection.toArray();

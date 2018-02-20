@@ -70,6 +70,8 @@ import { AutoTextareaComponent } from './auto-textarea/auto-textarea.component';
 import { ContainerComponent } from './container/container.component';
 import { DynamicComponent } from './dynamic/dynamic.component';
 import { ErrorComponent } from './error/error.component';
+import { DetailComponent } from './detail/detail.component';
+import { DetailContainerComponent } from './detail-container/detail-container.component';
 
 
 @NgModule({
@@ -93,7 +95,9 @@ import { ErrorComponent } from './error/error.component';
     AutoTextareaComponent,
     ContainerComponent,
     DynamicComponent,
-    ErrorComponent
+    ErrorComponent,
+    DetailComponent,
+    DetailContainerComponent
   ],
   entryComponents: [
     DialogPopup,
@@ -108,6 +112,8 @@ import { ErrorComponent } from './error/error.component';
     AutoTextareaComponent,
     ContainerComponent,
     DynamicComponent,
+    DetailComponent,
+    DetailContainerComponent
   ],
   imports: [
     HttpClientModule,

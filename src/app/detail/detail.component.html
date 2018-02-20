@@ -1,0 +1,22 @@
+<div class="container">
+
+  <div>
+    <mat-list>
+       <mat-list-item role="listitem" *ngFor="let side of sides">
+           <h5 *ngFor="let col of side.cols" style="margin:1px;" [style.width]="col.width" [style.border]="col.border" [style.background-color]="col.color">{{col.label}}</h5>
+       </mat-list-item>
+   </mat-list>
+  </div>
+  <mat-divider></mat-divider>
+
+  <div>
+    <mat-tab-group (focusChange)="onFocusChange($event)">
+
+      <mat-tab *ngFor="let detail of details" [label]="detail.label">
+          <app-detail-container [data]="detail.data" #details></app-detail-container>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+
+</div>
