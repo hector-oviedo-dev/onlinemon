@@ -74,7 +74,17 @@ export class DiagramComponent implements OnInit {
       //Alinear Vertical
       $("ContextMenuButton",
               $(go.TextBlock, "Alinear Verticalmente"),
-              { click: (e, obj) => this.onAlignVertical(e, obj) })
+              { click: (e, obj) => this.onAlignVertical(e, obj) }),
+      //Alinear Vertical
+      $("ContextMenuButton",
+              $(go.TextBlock, "Distribuir Horizontalmente"),
+              { click: (e, obj) => this.onAlignPropHorizontal(e, obj) }),
+      //Alinear Vertical
+      $("ContextMenuButton",
+              $(go.TextBlock, "Distribuir Verticalmente"),
+              { click: (e, obj) => this.onAlignPropVertical(e, obj) }),
+
+
 
       )
 
@@ -328,6 +338,62 @@ export class DiagramComponent implements OnInit {
     }
     this.SelectionMoved(null);
   }
+  public onAlignPropHorizontal(e, ob) {
+    let selectionDis = this.diagram.selection.toArray();
+
+    let selection = this.sort_by_key_value(selectionDis,'position.x');
+
+    let xfirst = selection[0].position.x;
+
+    let xlast = selection[selection.length-1].position.x;
+
+    let diff = xlast - xfirst;
+
+    let pos = diff / (selection.length-1);
+
+    for (let i = 0; i < selection.length; i++) {
+      let x = xfirst + pos * i;
+      (selection[i] as any).position = new go.Point(x, selection[i].location.y - selection[i].actualBounds.height/2);
+    }
+    this.SelectionMoved(null);
+  }
+  public onAlignPropVertical(e, ob) {
+    let selectionDis = this.diagram.selection.toArray();
+
+    let selection = this.sort_by_key_value(selectionDis,'position.y');
+
+    let yfirst = selection[0].position.y;
+
+    let ylast = selection[selection.length-1].position.y;
+
+    let diff = ylast - yfirst;
+
+    let pos = diff / (selection.length-1);
+
+    for (let i = 0; i < selection.length; i++) {
+      let y = yfirst + pos * i;
+      (selection[i] as any).position = new go.Point(selection[i].location.x - selection[i].actualBounds.width/2,y);
+    }
+    this.SelectionMoved(null);
+  }
+  private sort_by_key_value(arr, key) {
+  var to_s = Object.prototype.toString;
+  var valid_arr = to_s.call(arr) === '[object Array]';
+  var valid_key = typeof key === 'string';
+
+  if (!valid_arr || !valid_key) {
+    return;
+  }
+
+  arr = arr.slice();
+
+  return arr.sort(function(a, b) {
+    var a_key = String(a[key]);
+    var b_key = String(b[key]);
+    var n = (a_key as any) - (b_key as any);
+    return !isNaN(n) ? n : a_key.localeCompare(b_key);
+  });
+}
 
   /*
   public setFilter(type ,value) {

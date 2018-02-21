@@ -13,7 +13,12 @@ export class LeftSideComponent implements OnInit {
   @ViewChild("uid")
   private uid:ElementRef;
 
-  public toggle = { search:false, filter:false }
+  public views = [
+    { label:"Por Estado", value:"state",
+    },
+    { label:"Por Mapa Termico" , value:"thermal",
+    }
+  ]
   public filters = [
     { label:"Marca", value:"brand",
       values:[{label:"IGT", value:"IGT"},{label:"WILLIAMS", value:"WILLIAMS"},{label:"BALLI", value:"BALLI"}]

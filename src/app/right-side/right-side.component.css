@@ -1,23 +1,37 @@
-.titleClass {
+.cont {
+  height: calc(100vh - 56px);
+  background-color: lightgray;
+  min-width: 150px;
+}
 
+.titleClass {
+  text-align: right;
+  margin: 0;
+  border: 0;
+  background-color: white;
 }
 .boxClass {
+  margin: 2px;/*
   border-style: solid;
-  //border-radius:5px;
-  border-color: coral;
-  border-width: 2px;
+  border-radius:5px;
+  border-bottom: 0px;
   border-left: 0px;
   border-right: 0px;
   border-top: 0px;
-  background-color: lightgray;
+  margin: 2px;
+  background-color: lightgray;*/
 }
 .boxItem {
+  text-align: center;
   border-style: solid;
-  border-color: coral;
-  border-width: 1px;
-  border-top: 0px;
+  border-radius:5px;
+  border-bottom: 0px;
   border-left: 0px;
   border-right: 0px;
-  margin: 5px;
-  //background-color: lightgray;
+  border-top: 0px;
+  margin: 2px;
+  background-color: lightyellow;
+}
+.boxText {
+  border: 2px;
 }

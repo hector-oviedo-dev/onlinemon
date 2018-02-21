@@ -1,0 +1,10 @@
+.cont {
+  height: calc(100vh - 56px);
+  background-color: lightgray;
+}
+.titleClass {
+  text-align: left;
+  margin: 0;
+  border: 0;
+  background-color: white;
+}

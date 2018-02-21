@@ -1,48 +1,66 @@
-<div class="container">
-  <mat-list>
-   <mat-list-item><div style="text-align:center;min-width:100%;"><h3>Views</h3></div></mat-list-item>
-   <mat-list-item><button mat-raised-button style="min-width:100%;">Estado</button></mat-list-item>
-   <mat-list-item><button mat-raised-button style="min-width:100%;">Mapa Termico</button></mat-list-item>
-   <mat-list-item><button mat-raised-button style="min-width:100%;" (click)="!toggle.filter ? toggle.filter=true:toggle.filter=false">Filtros</button></mat-list-item>
-   <mat-list *ngIf="toggle.filter">
+<mat-list class="cont">
+  <mat-list-item class="titleClass"><h4>Herramientas</h4></mat-list-item>
+  <mat-divider></mat-divider>
 
-     <mat-accordion>
-     <mat-expansion-panel *ngFor="let filter of filters" (opened)="primary = filter.value">
-         <mat-expansion-panel-header>
-           <mat-panel-title>
-             {{filter.label}}
-           </mat-panel-title>
-         </mat-expansion-panel-header>
+<!--Views START-->
+<mat-expansion-panel hideToggle="true">
 
-         <mat-radio-group *ngIf="(primary==filter.value)" [(ngModel)]="secondary">
-           <mat-list-item *ngFor="let sub of filter.values"><mat-checkbox value="sub.value">{{sub.label}}</mat-checkbox>
-           </mat-list-item>
-         </mat-radio-group>
+<mat-expansion-panel-header>
+ <mat-panel-title>
+   Visualizacion
+ </mat-panel-title>
+</mat-expansion-panel-header>
 
-   </mat-expansion-panel>
-   </mat-accordion>
+<mat-radio-group>
+ <mat-list-item *ngFor="let view of views;let first = first;">
+   <mat-radio-button style="font-size: 12px;" [value]="view.value" [checked]="first">{{view.label}}</mat-radio-button>
+ </mat-list-item>
+</mat-radio-group>
 
-   </mat-list>
-  </mat-list>
-</div>
-<br>
-<mat-divider></mat-divider>
-<br>
-<div class="container">
+</mat-expansion-panel>
+<!--Views END-->
 
 
-<mat-expansion-panel>
+ <!--Filtros START-->
+ <mat-expansion-panel hideToggle="true">
+
+   <mat-expansion-panel-header>
+     <mat-panel-title>
+       Filtros
+     </mat-panel-title>
+   </mat-expansion-panel-header>
+
+   <div *ngFor="let filter of filters" class="filterBox">
+
+    <label><i><b>{{filter.label}}</b></i><mat-divider></mat-divider></label>
+
+    <mat-list-item *ngFor="let sub of filter.values">
+     <mat-checkbox style="font-size: 12px;" [value]="sub.value" [checked]="true">{{sub.label}}</mat-checkbox>
+    </mat-list-item>
+
+   </div>
+
+ </mat-expansion-panel>
+ <!--Filtros END-->
+
+
+ <!--Busqueda START-->
+<mat-expansion-panel hideToggle="true">
   <mat-expansion-panel-header>
     <mat-panel-title>
       Buscar
     </mat-panel-title>
   </mat-expansion-panel-header>
-<div class="">
-  <mat-list>
-    <mat-list-item><mat-form-field><input matInput placeholder="UID" id="uid" #uid></mat-form-field></mat-list-item>
-    <mat-list-item style="text-align:right"><button mat-raised-button color="primary" (click)="doSearch()">Buscar</button></mat-list-item>
-  </mat-list>
-</div>
+
+  <div>
+    <mat-list>
+      <mat-list-item><mat-form-field><input matInput placeholder="UID" id="uid" #uid></mat-form-field></mat-list-item>
+      <mat-list-item><button mat-raised-button color="primary" (click)="doSearch()">Buscar</button></mat-list-item>
+    </mat-list>
+  </div>
 
 </mat-expansion-panel>
-</div>
+   <!--Busqueda END-->
+
+
+</mat-list>

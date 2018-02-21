@@ -1,7 +1,8 @@
-<mat-list class="titleClass">
+<mat-list  class="cont">
+  <mat-list-item class="titleClass"><h4 style="text-align:right">Alertas</h4></mat-list-item>
+  <mat-divider></mat-divider>
 
-    <mat-list-item><div style="text-align:center;min-width:100%;"><h3>Alertas</h3></div></mat-list-item>
     <div class="boxClass">
-      <div *ngFor="let alarm of alarms" class="boxItem">{{alarm.content}}</div>
+      <div *ngFor="let alarm of alarms" class="boxItem"><label class="boxText">{{alarm.content}}</label></div>
     </div>
 </mat-list>
