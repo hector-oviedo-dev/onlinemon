@@ -178,7 +178,7 @@ export class DiagramComponent implements OnInit {
         bg.stroke = "gray";
     }
   }
-  public SelectionMoved(e) {
+  public SelectionMoved(e) {/*
     let obj = this.diagram.selection.first() as any;
     if (!obj) return;
 
@@ -193,6 +193,28 @@ export class DiagramComponent implements OnInit {
 
     let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
     this.services.sendMessage(JSON.stringify(msg));
+    */
+    let msgArr = [];
+
+    let selection = this.diagram.selection.toArray();
+
+    for (let i = 0; i < selection.length; i++) {
+      let obj = selection[i] as any;
+      if (!obj) return;
+
+      let actualUID = obj.Zd.uid;
+      let actualX = parseInt(obj.location.x);
+      let actualY = parseInt(obj.location.y);
+      let actualR = parseInt(obj.angle);
+
+      obj.Zd.loc.x = actualX;
+      obj.Zd.loc.y = actualY;
+      obj.Zd.angle = actualR;
+
+      msgArr.push({ uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR });
+    }
+    console.log(JSON.stringify(msgArr))
+    //this.services.sendMessage(JSON.stringify(msgArr));
   }
   public PartRotated(e) {
     let obj = e.subject;
@@ -292,25 +314,19 @@ export class DiagramComponent implements OnInit {
   }
   public onAlignHorizontal(e, ob) {
     let selection = this.diagram.selection.toArray();
-    let y = 0;
+    let y = this.diagram.selection.first().position.y;
     for (let i = 0; i < selection.length; i++) {
-
-      if (i == 0) y = selection[i].location.y;
-
-      (selection[i] as any).position = new go.Point(selection[i].location.x - this.objectwidth/2, y);
-
+      (selection[i] as any).position = new go.Point(selection[i].location.x - selection[i].actualBounds.width/2, y);
     }
+    this.SelectionMoved(null);
   }
   public onAlignVertical(e, ob) {
     let selection = this.diagram.selection.toArray();
-    let x = 0;
+    let x = this.diagram.selection.first().position.x;
     for (let i = 0; i < selection.length; i++) {
-
-      if (i == 0) x = selection[i].location.x;
-
-      (selection[i] as any).position = new go.Point(x, selection[i].location.y - this.objectwidth/2);
-
+      (selection[i] as any).position = new go.Point(x, selection[i].location.y - selection[i].actualBounds.height/2);
     }
+    this.SelectionMoved(null);
   }
 
   /*
@@ -415,6 +431,16 @@ export class DiagramComponent implements OnInit {
 
         let point  = new go.Point(x,y)
         this.diagram.position = point;
+
+        /*
+        let bg = actualOBJ.port.findObject("bg");
+        if (bg !== null) {
+          if (actualOBJ.port.isSelected)
+            bg.stroke = "blue";
+          else
+            bg.stroke = "gray";
+        }
+        */
       }
     }
   }

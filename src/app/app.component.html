@@ -16,15 +16,14 @@
 
 
 
-<div class="container"
-     fxLayoutAlign="center">
-  <div class="item item-1" fxFlex="15%"><app-left-side></app-left-side></div>
-  <div class="item item-2" fxFlex="85%"><app-layout></app-layout></div>
+<div class="container">
+  <div class="item item-1" fxFlex="15%" fxFlexFill><app-left-side></app-left-side></div>
+  <div class="item item-2" fxFlex="85%" class="layoutContainer"><app-layout></app-layout></div>
 
   <mat-drawer-container autosize>
     <mat-drawer #drawer mode="side">
       <app-right-side></app-right-side>
-      <button style="min-width:100%;" type="button" mat-raised-button color="warn" (click)="drawer.toggle()">
+      <button style="min-width:100%;padding: 0 0;margin: 0;font-size: 10px;" type="button" mat-raised-button color="warn" (click)="drawer.toggle()">
         >
       </button>
     </mat-drawer>
@@ -36,8 +35,6 @@
 
 
 
-
-
 </div>
 
-<app-footer></app-footer>
+<!--<app-footer></app-footer>-->

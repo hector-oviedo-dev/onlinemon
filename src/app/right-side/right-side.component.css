@@ -3,9 +3,13 @@
 }
 .boxClass {
   border-style: solid;
-  border-radius:5px;
+  //border-radius:5px;
   border-color: coral;
   border-width: 2px;
+  border-left: 0px;
+  border-right: 0px;
+  border-top: 0px;
+  background-color: lightgray;
 }
 .boxItem {
   border-style: solid;
@@ -15,4 +19,5 @@
   border-left: 0px;
   border-right: 0px;
   margin: 5px;
+  //background-color: lightgray;
 }

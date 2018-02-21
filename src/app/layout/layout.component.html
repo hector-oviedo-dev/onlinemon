@@ -1,6 +1,6 @@
-<mat-tab-group (focusChange)="onFocusChange($event)">
+<mat-tab-group (focusChange)="onFocusChange($event)" fxFlex>
 
-  <mat-tab *ngFor="let area of areas;let last = last" [label]="area.label" [attr.ready]="last ? false : true">
+  <mat-tab *ngFor="let area of areas;let last = last" [label]="area.label" [attr.ready]="last ? false : true" class="tabContainer">
       <app-diagram [area]="area.area" #diagrams></app-diagram>
   </mat-tab>
 

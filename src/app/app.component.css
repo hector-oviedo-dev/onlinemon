@@ -1,7 +1,6 @@
-.demo-tab-group {
-  border: 1px solid #e8e8e8;
+.container {
+  //height: 100vh;
 }
-
-.demo-tab-content {
-  padding: 16px;
+.layoutContainer {
+  //height: 100vh;
 }
