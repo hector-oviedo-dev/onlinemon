@@ -9,9 +9,9 @@ export class RightSideComponent implements OnInit {
 
   public alarms = [];
   constructor() {
-    this.alarms.push({type:'text',content:'Maquina 000005 Esta Offline.'});
+    this.alarms.push({type:'text',content:'Maquina 000005 Offline.'});
     this.alarms.push({type:'text',content:'Maquina 000007 Puerta Abierta.'});
-    this.alarms.push({type:'text',content:'Maquina 000002 Esta Offline.'});
+    this.alarms.push({type:'text',content:'Maquina 000002 Offline.'});
   }
 
   ngOnInit() {

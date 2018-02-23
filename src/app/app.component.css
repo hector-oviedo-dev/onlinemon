@@ -6,6 +6,7 @@
   font-size: 12px;
 }
 .buttonBack {
+  background-color: gray;
   min-width:100%;
   padding: 0 0;
   margin: 0;

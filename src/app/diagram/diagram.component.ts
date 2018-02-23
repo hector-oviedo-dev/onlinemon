@@ -26,6 +26,11 @@ export class DiagramComponent implements OnInit {
   private started:boolean = false;
   constructor(private services:ServicesService) {
     this.events = services.events;
+
+    this.events.subscribe("onFilter", (data) => this.onFilter(data));
+  }
+  public onFilter(data) {
+    
   }
   ngOnInit() {
     this.start();
