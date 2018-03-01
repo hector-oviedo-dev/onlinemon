@@ -18,11 +18,7 @@ export class LayoutComponent implements OnInit {
   constructor(private services:ServicesService) {
       this.events = services.events;
 
-      this.areas.push({label:"Piso A",area:"a"});
-      this.areas.push({label:"Piso B",area:"b"});
-      this.areas.push({label:"Piso C",area:"c"});
-      this.areas.push({label:"Piso D",area:"d"});
-      this.areas.push({label:"Piso E",area:"e"});
+      this.events.subscribe("onAreas", (data) => this.onAreas(data));
   }
   @Input()
     set ready(isReady: boolean) {
@@ -32,8 +28,14 @@ export class LayoutComponent implements OnInit {
   ngOnInit() {
 
   }
+  public onAreas(data) {
+    this.areas = [];
+
+    for (var i = 0; i < data.length; i++) this.areas.push({label:data[i].entitylabel,area:data[i].value});
+  }
   public onFocusChange(e) {
-    console.log("haschanged: " + this.areas[e.index].label)
-    //this.diagrams._results[e.index].doStart();
+    //console.log("haschanged: " + this.areas[e.index].label)
+    this.services.events.publish("onUpdate",this.areas[e.index].label);
+
   }
 }

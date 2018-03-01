@@ -59,6 +59,9 @@ export class AutoInputComponent implements OnInit {
     }
   }
   public onChange(event) {
+    console.log(this._value)
+    //this._value = event
+
     let data = { id:this._ID, valid:this._form.controls['data'].valid };
     this.events.publish("onForm", JSON.stringify(data));
   }

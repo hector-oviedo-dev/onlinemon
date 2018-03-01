@@ -35,7 +35,7 @@
     <label><i><b>{{filter.label}}</b></i><mat-divider></mat-divider></label>
 
     <mat-list-item *ngFor="let sub of filter.values">
-     <mat-checkbox style="font-size: 12px;" [value]="sub.value" [checked]="true">{{sub.label}}</mat-checkbox>
+     <mat-checkbox style="font-size: 12px;" [value]="sub.value" [checked]="true" (click)="doFilter(sub)">{{sub.label}}</mat-checkbox>
     </mat-list-item>
 
    </div>

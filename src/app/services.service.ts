@@ -7,12 +7,30 @@ export class ServicesService {
   private ws:WebSocket;
   private WS_URL:string = "ws://10.10.2.63:8080";
 
-  public _SERVICE_BASE = "http://10.10.2.63:8080/api/";
+  public _SERVICE_BASE = "http://localhost:5000/";
 
-  public hardcoded:boolean = true;
+  public hardcoded:boolean = false;
+
+  public AUTO_REFRESH_TIME_MINS:number = 1;
+  public AUTO_REFRESH_TIME:number = this.AUTO_REFRESH_TIME_MINS * 60 * 100;
 
   constructor(public http: HttpClient, public events:EventsService) {
 
+  }
+  public getMachines() {
+    this.doGet("getFirstLoad","").subscribe(
+      res => { this.onMachinesResult(res); },
+      err => { }
+    );
+  }
+  public onMachinesResult(data) {
+    //setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
+
+    let res = data.json;
+
+    console.log("quisiera hacer un trace... para")
+
+    this.events.publish("onMachines", res);
   }
   public connect() {
 
@@ -40,7 +58,7 @@ export class ServicesService {
     this.ws = null;
   }
   private handleMessageReceived(data) {
-    this.events.publish('onMachines', data.data);
+    //this.events.publish('onMachines', data.data);
   }
   private handleConnected(data) {
     console.log("connected")

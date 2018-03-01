@@ -24,19 +24,34 @@ export class DiagramComponent implements OnInit {
   public activated:boolean = false;
 
   private started:boolean = false;
+
+  public filters = [];
   constructor(private services:ServicesService) {
     this.events = services.events;
 
     this.events.subscribe("onFilter", (data) => this.onFilter(data));
+    this.events.subscribe("onUpdate", (data) => this.onUpdate(data));
   }
   public onFilter(data) {
-    
+    this.filters = [];
+    for (let i = 0; i < data.length;i++) {
+
+      for (let j = 0; j < data[i].values.length;j++)
+      {
+        this.filters.push({propertyname:data[i].values[j].propertyname,value:data[i].values[j].value,check:data[i].values[j].check})
+      }
+
+    }
+    this.doFilters();
+  }
+  public onUpdate(data) {
+    this.diagram.requestUpdate();
   }
   ngOnInit() {
     this.start();
   }
   @HostListener('change') ngOnChanges() {
-       console.log('test');
+
    }
   public doStart() {
     //if (!this.started) this.start();
@@ -88,9 +103,6 @@ export class DiagramComponent implements OnInit {
       $("ContextMenuButton",
               $(go.TextBlock, "Distribuir Verticalmente"),
               { click: (e, obj) => this.onAlignPropVertical(e, obj) }),
-
-
-
       )
 
 
@@ -101,6 +113,8 @@ export class DiagramComponent implements OnInit {
         selectionChanged: function (obj) { that.onSelectionChanged(obj); },
         doubleClick: function (e, obj) { that.onClick(e, obj); },
       },
+      new go.Binding("name", "uid"),
+      new go.Binding("visible", "visible"),
       //Fondo
       $(go.Shape, "Rectangle",
         {
@@ -181,8 +195,7 @@ export class DiagramComponent implements OnInit {
     this.events.subscribe("onSearch",(data) => this.onSearch(data));
     this.events.subscribe("onMachines",(data) => this.onMachines(data));
 
-
-    this.onMachines('{"maquinas":[]}');
+    this.events.publish("getMachines",'');
   }
   public onSelectionChanged(obj) {
     var bg = obj.findObject("bg");
@@ -227,9 +240,31 @@ export class DiagramComponent implements OnInit {
       obj.Zd.angle = actualR;
 
       msgArr.push({ uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR });
+
+/*
+      let data = new URLSearchParams("");
+      data.set('uid', actualUID);
+      data.set('pos_x', actualX.toString());
+      data.set('pos_y', actualY.toString());
+      data.set('angle', actualR.toString());*/
+
+
+      let data = {
+        uid:actualUID,
+        pos_x:actualX,
+        pos_y:actualY,
+        angle:actualR,
+      }
+      this.services.doPost("update", data).subscribe(
+          res => { this.onUpdateResult(res); },
+          err => { }
+        );
     }
-    console.log(JSON.stringify(msgArr))
+    //console.log(JSON.stringify(msgArr))
     //this.services.sendMessage(JSON.stringify(msgArr));
+  }
+  public onUpdateResult(res) {
+    console.log(res)
   }
   public PartRotated(e) {
     let obj = e.subject;
@@ -249,7 +284,11 @@ export class DiagramComponent implements OnInit {
   }
   //Agregar Nueva Maquina
   public onAddMachine(e, obj) {
-    let data = { service:"onAddMachine",data:"" };
+    let loc = e.diagram.toolManager.contextMenuTool.mouseDownPoint;
+
+    let dataSTR = "?userid="+ " " + "&area=" + this.area + "&xpos=" + parseInt(loc.x) + "&ypos=" + parseInt(loc.y);
+
+    let data = { service:"getAltaForm"+dataSTR,data:null };
     this.events.publish("onPopup", data);
     /*
     let diagram = e.diagram;
@@ -315,12 +354,14 @@ export class DiagramComponent implements OnInit {
   }
   //Online Programado
   public onProgOffline(e,obj) {
-    let data = { data:obj.part.Zd.uid, service:"onOffline" };
+    let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm" };
     this.events.publish("onPopup", data);
   }
   //Online Programado
   public onBaja(e,obj) {
-    let data = { data:obj.part.Zd.uid, service:"onBaja" };
+    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid;
+
+    let data = { service:"getBajaForm"+dataSTR,data:null };
     this.events.publish("onPopup", data);
   }
   public onClick(e, obj) {
@@ -400,43 +441,39 @@ export class DiagramComponent implements OnInit {
   });
 }
 
-  /*
-  public setFilter(type ,value) {
+
+  public doFilters() {
     let found:boolean = false;
     for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
       let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
-      if (actualOBJ[type] == value) {
-        console.log( type + " found at " + JSON.stringify(this.diagram.model.nodeDataArray[i]));
-        (this.diagram.model.nodeDataArray[i] as any).visible = false;
-      } else (this.diagram.model.nodeDataArray[i] as any).visible = true;
+
+      let node = this.diagram.findNodeForKey(actualOBJ.key);
+      node.visible = true;
+
+      for (var k = 0; k < this.filters.length; k++) {
+
+        let actualFilter = this.filters[k];
+
+        if ((actualOBJ.filters[actualFilter.propertyname] == actualFilter.value)  && !actualFilter.check) {
+          node.visible = false;
+        }
+      }
     }
-  }*/
+    this.diagram.requestUpdate();
+  }
   public onMachines(dataSTR) {
     if (this.diagram.toolManager.draggingTool.draggedParts) return;
 
-    let data = JSON.parse(dataSTR);
+    let data;
+    try { JSON.parse(dataSTR); }
+    catch (err) { data = dataSTR; }
 
     const $ = go.GraphObject.make;
 
-    /*
-    data = {
-      maquinas:[
-        { uid:"000001", label_state: "online", loc: { x:0, y:0 }, color: "green", angle:30 },
-        { uid:"000002", label_state: "offline", loc: { x:50, y:0 }, color: "red", angle:0 },
-        { uid:"000003", label_state: "online", loc: { x:100, y:0 }, color: "green", angle:0 },
-        { uid:"000004", label_state: "online", loc: { x:150, y:0 }, color: "green",angle:0 },
-        { uid:"000005", label_state: "offline",loc: { x:0, y:50 }, color: "red", angle:0 },
-        { uid:"000006", label_state: "online",loc: { x:0, y:100 }, color: "green", angle:0 },
-        { uid:"000007", label_state: "offline", loc: { x:0, y:150 }, color: "yellow", angle:0 },
-        { uid:"000008", label_state: "online", loc: { x:0, y:200 }, color: "green", angle:0 }
-      ]
-    }
-    */
     let nodes = [];
     for (let j = 0; j < this.diagram.model.nodeDataArray.length; j++) nodes.push(this.diagram.model.nodeDataArray[j]);
 
     for (let i = 0; i < data.maquinas.length; i++) {
-      console.log("area: " +  this.area + " obj: " + JSON.stringify(data.maquinas[i]))
 
       let obj = {
         uid:data.maquinas[i].uid,
@@ -446,6 +483,8 @@ export class DiagramComponent implements OnInit {
         angle:data.maquinas[i].angle,
         area:data.maquinas[i].area,
         ip:data.maquinas[i].ip+":"+data.maquinas[i].port,
+        filters:data.maquinas[i].filters,
+        visible:true,
       }
 
       let node;
@@ -484,7 +523,6 @@ export class DiagramComponent implements OnInit {
   }
   public onSearch(data) {
     this.doSearch(data);
-    console.log("llega evento: " + data)
   }
   //Buscar
   public doSearch(uid) {

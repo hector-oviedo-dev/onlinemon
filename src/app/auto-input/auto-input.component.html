@@ -12,7 +12,7 @@
   <tr>
     <td>
       <mat-form-field>
-        <input matInput formControlName="data" placeholder="{{_placeholder}}" min="{{_min}}" maxlength="{{_max}}" [(value)]="_value" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formTextValid':'formTextInalid'):'formTextDisabled'" (keyup)="onChange($event)">
+        <input matInput formControlName="data" placeholder="{{_placeholder}}" min="{{_min}}" maxlength="{{_max}}" [(ngModel)]="_value" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formTextValid':'formTextInalid'):'formTextDisabled'" (keyup)="onChange($event)">
       </mat-form-field>
     </td>
   </tr>

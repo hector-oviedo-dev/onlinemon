@@ -14,7 +14,9 @@ export class DetailContainerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.rows = JSON.parse(this.data);
+    try { this.rows = JSON.parse(this.data); }
+    catch (err) { };
+
   }
 
 }

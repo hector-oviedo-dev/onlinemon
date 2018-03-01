@@ -45,6 +45,8 @@ export class AutoFormComponent implements OnInit {
     for (let i = 0; i < this._controls.length;i++) {
       if (this._controls[i].id == obj.id) this._controls[i].valid = obj.valid;
       if (!this._controls[i].valid) this._valid = false;
+
+      console.log("id " + this._controls[i].id  + "valid " + this._controls[i].valid)
     }
 
   }
@@ -52,7 +54,7 @@ export class AutoFormComponent implements OnInit {
     let data = [];
     for (var i = 0; i < this.components.length; i++) data.push(this.components[i].instance.getValue());
 
-    this.services.doPost(this._action,JSON.stringify(data)).subscribe(
+    this.services.doPost(this._action,data).subscribe(
       data => { this.onServiceResult(data); },
       err => {
         let data = { "MESSAGE":"404 Server Address" }
@@ -63,13 +65,13 @@ export class AutoFormComponent implements OnInit {
 
   }
   public onServiceResult(result) {
-
+    console.log(result);/*
     if (result.success == true) console.log("Success");
     else {
       let data = { "MESSAGE":result.error }
       //this.navCtrl.push(ErrorPage, data);
       console.log(data);
-     }
+    }*/
   }
   public cancelClick() {
 
@@ -160,7 +162,19 @@ export class AutoFormComponent implements OnInit {
             return;
           } else this.addSelect(this.values[i]);
 
-          break;/*
+          break;
+          case "DATE":
+            arr = ["id","hidden","enabled","required","txt_required","txt_help","label"];
+            result = (this.validateComponent(this.values[i],arr));
+
+            if (!result.valid) {
+              let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
+              //this.navCtrl.push(ErrorPage, data);
+              console.log(data);
+              return;
+            } else this.addDate(this.values[i]);
+
+            break;/*
           case "DUOSELECT":
             arr = ["id","hidden","enabled","required","txt_required","txt_help","label","values"];
             result = (this.validateComponent(this.values[i],arr));
@@ -173,7 +187,7 @@ export class AutoFormComponent implements OnInit {
 
             break;*/
       }
-
+      if (this.values[i].hidden) control.valid = true;
       this._controls.push(control);
     }
   }
@@ -248,7 +262,7 @@ export class AutoFormComponent implements OnInit {
     // Push the component so that we can keep track of which components are created
     this.components.push(component);
     return true;
-  }/*
+  }
   public addDate(value:any) {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(AutoDateComponent);
     const component = this.container.createComponent(componentFactory);
@@ -264,9 +278,6 @@ export class AutoFormComponent implements OnInit {
     (<AutoDateComponent>component.instance)._txt_error   = value.txt_error;
     (<AutoDateComponent>component.instance)._txt_help    = value.txt_help;
 
-    (<AutoDateComponent>component.instance)._min         = value.min;
-    (<AutoDateComponent>component.instance)._max         = value.max;
-
     (<AutoDateComponent>component.instance)._mask        = value.mask;
     (<AutoDateComponent>component.instance)._format      = value.format;
 
@@ -280,7 +291,7 @@ export class AutoFormComponent implements OnInit {
     // Push the component so that we can keep track of which components are created
     this.components.push(component);
     return true;
-  }*/
+  }
   public addCheckbox(value:any) {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(AutoCheckComponent);
     const component = this.container.createComponent(componentFactory);

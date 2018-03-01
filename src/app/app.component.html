@@ -2,11 +2,11 @@
 <div fxLayout="row">
 
   <!--Tools-->
-  <mat-drawer-container>
+  <mat-drawer-container (close)="updateDiagrams()" (open)="updateDiagrams()">
 
     <button class="buttonOpen" type="button" mat-raised-button color="primary" (click)="tools.toggle()">></button>
 
-    <mat-drawer #tools mode="side">
+    <mat-drawer #tools mode="side" (close)="updateDiagrams()" (open)="updateDiagrams()">
       <button class="buttonBack" type="button" mat-raised-button color="primary" (click)="tools.toggle()"><</button>
       <app-left-side></app-left-side>
     </mat-drawer>
@@ -18,9 +18,9 @@
   <!--End Diagram-->
 
   <!--Alerts-->
-  <mat-drawer-container>
+  <mat-drawer-container (close)="updateDiagrams()" (open)="updateDiagrams()">
     <button class="buttonOpen" type="button" mat-raised-button color="primary" (click)="alerts.toggle()"><</button>
-    <mat-drawer #alerts mode="side">
+    <mat-drawer #alerts mode="side"  (close)="updateDiagrams()" (open)="updateDiagrams()">
       <button class="buttonBack" type="button" mat-raised-button color="primary" (click)="alerts.toggle()">></button>
       <app-right-side></app-right-side>
     </mat-drawer>

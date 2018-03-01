@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ServicesService } from '../services.service';
+import { EventsService } from 'angular4-events';
 
 @Component({
   selector: 'app-right-side',
@@ -6,15 +8,21 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./right-side.component.css']
 })
 export class RightSideComponent implements OnInit {
+  private events: EventsService;
 
-  public alarms = [];
-  constructor() {
-    this.alarms.push({type:'text',content:'Maquina 000005 Offline.'});
-    this.alarms.push({type:'text',content:'Maquina 000007 Puerta Abierta.'});
-    this.alarms.push({type:'text',content:'Maquina 000002 Offline.'});
+  public alerts = [];
+  constructor(private services:ServicesService) {
+    this.events = services.events;
+
+    this.events.subscribe("onMachines", (data) => this.onAlerts(data));
   }
 
   ngOnInit() {
   }
+  public onAlerts(data) {
+    if (!data.alerts) return;
 
+    this.alerts = [];
+    for (let alert of data.alerts) this.alerts.push({type:(alert as any).type,label:(alert as any).label});
+  }
 }

@@ -13,34 +13,40 @@ export class LeftSideComponent implements OnInit {
   @ViewChild("uid")
   private uid:ElementRef;
 
-  public views = [
-    { label:"Por Estado", value:"state",
-    },
-    { label:"Por Mapa Termico" , value:"thermal",
-    }
-  ]
-  public filters = [
-    { label:"Marca", value:"brand",
-      values:[{label:"IGT", value:"IGT"},{label:"WILLIAMS", value:"WILLIAMS"},{label:"BALLI", value:"BALLI"}]
-    },
-    { label:"Estado" , value:"state",
-      values:[{label:"Online",value:"online"},{label:"Offline",value:"offline"}]
-    }
-  ];
+  public views = [ ];
+  public filters = [ ];
   public primary:string;
   public secondary:string;
 
   constructor(private services:ServicesService) {
     this.events = services.events;
+
+    this.events.subscribe("onTools", (data) => this.onTools(data));
   }
   ngOnInit() {
 
   }
+  public onTools(data) {
+    this.views = [];
+    this.filters = [];
+
+    for (let i = 0; i < data.views.length; i++) this.views.push({label: data.views[i].entitylabel, value:data.views[i].value});
+
+    for (let i = 0; i < data.filters.length; i++) {
+      let valuesTMP = [];
+
+      for (let j = 0; j < data.filters[i].values.length; j++) valuesTMP.push({label:data.filters[i].values[j].value,value:data.filters[i].values[j].value,propertyname:data.filters[i].values[j].propertyname,check:true})
+
+      this.filters.push({label: data.filters[i].label, value:data.filters[i].value, values:valuesTMP});
+    }
+  }
   public doSearch() {
-    console.log("search")
+    console.log("search");
     this.events.publish("onSearch", this.uid.nativeElement.value);
   }
-  public doFilter() {
-    this.events.publish("onFilter", "");
+  public doFilter(data) {
+    if (data.check) data.check = false;
+    else data.check = true;
+    this.events.publish("onFilter", this.filters);
   }
 }
