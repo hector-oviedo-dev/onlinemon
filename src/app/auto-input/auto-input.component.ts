@@ -44,6 +44,8 @@ export class AutoInputComponent implements OnInit {
   public createForm() {
     this._form = this._fb.group({data:[""]});
 
+    if (this._hidden) return;
+
     let validators = [];
     if (this._required) validators.push(Validators.required);
     if (this._required) validators.push(Validators.minLength(this._min));

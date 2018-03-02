@@ -1,4 +1,5 @@
 import { Component, Inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ServicesService } from './services.service';
 import { EventsService } from 'angular4-events';
@@ -12,21 +13,33 @@ export class AppComponent {
   public rightElement:boolean = true;
   private events: EventsService;
 
-  constructor(private services:ServicesService, public dialog: MatDialog) {
-    this.events = services.events;
-    this.events.subscribe("onPopup", (data) => this.onPopup(data));
-    //this.events.subscribe("getMachines", (data) => this.onGetMachines(data));
+  constructor(public http: HttpClient,private services:ServicesService, public dialog: MatDialog) {
 
-    //this.services.connect();
+        let headers = new HttpHeaders();
+        headers = headers.set('Content-Type', 'application/json; charset=utf-8');
 
-    this.services.doGet("getFirstLoad","").subscribe(
-        res => { this.onServiceResult(res); },
-        err => {
-          //let data = this.createExample();
-          //console.log("MESSAGE 404 Server Address " + JSON.stringify(data));
-          //this.onServiceResult(data);
-        }
-      );
+        let url = "/assets/config.json";
+        this.http.get(url, {headers: headers}).subscribe(res => {
+          services._SERVICE_BASE = (res as any).server;
+
+          this.events = services.events;
+          this.events.subscribe("onPopup", (data) => this.onPopup(data));
+          //this.events.subscribe("getMachines", (data) => this.onGetMachines(data));
+
+          //this.services.connect();
+
+          this.services.doGet("getFirstLoad","").subscribe(
+              res => { this.onServiceResult(res); },
+              err => {
+                //let data = this.createExample();
+                //console.log("MESSAGE 404 Server Address " + JSON.stringify(data));
+                //this.onServiceResult(data);
+              }
+            );
+
+
+        });
+
   }
   public onServiceResult(data) {
     let res = data.json;

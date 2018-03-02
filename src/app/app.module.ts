@@ -68,7 +68,6 @@ import { AutoRadioComponent } from './auto-radio/auto-radio.component';
 import { AutoSelectComponent } from './auto-select/auto-select.component';
 import { AutoTextareaComponent } from './auto-textarea/auto-textarea.component';
 import { ContainerComponent } from './container/container.component';
-import { DynamicComponent } from './dynamic/dynamic.component';
 import { ErrorComponent } from './error/error.component';
 import { DetailComponent } from './detail/detail.component';
 import { DetailContainerComponent } from './detail-container/detail-container.component';
@@ -94,7 +93,6 @@ import { DetailContainerComponent } from './detail-container/detail-container.co
     AutoSelectComponent,
     AutoTextareaComponent,
     ContainerComponent,
-    DynamicComponent,
     ErrorComponent,
     DetailComponent,
     DetailContainerComponent
@@ -111,7 +109,6 @@ import { DetailContainerComponent } from './detail-container/detail-container.co
     AutoSelectComponent,
     AutoTextareaComponent,
     ContainerComponent,
-    DynamicComponent,
     DetailComponent,
     DetailContainerComponent
   ],

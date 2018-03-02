@@ -708,7 +708,7 @@ export class ContainerComponent implements OnInit {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(AutoGridComponent);
     const component = this.container.createComponent(componentFactory);
 
-    (<AutoGridComponent>component.instance).startProcess(null);
+    //(<AutoGridComponent>component.instance).startProcess();
 
     this.components.push(component);
   }

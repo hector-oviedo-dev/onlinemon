@@ -20,7 +20,9 @@ export class DetailComponent implements OnInit {
     this.sides = res.info;
     this.details = res.tabs;
   }
-
+  public onFocusChange(e) {
+    if (this.details[e.index].type == "grid") console.log("try")
+  }
   ngOnInit() {
 
   }

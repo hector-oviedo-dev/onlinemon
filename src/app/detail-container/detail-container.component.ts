@@ -8,6 +8,10 @@ import { Component, OnInit, Input } from '@angular/core';
 export class DetailContainerComponent implements OnInit {
   @Input()
   public data:string = "";
+
+  @Input()
+  public datatype:string = "";
+
   public rows = [];
   constructor() {
     //this.rows = JSON.parse(this.data);

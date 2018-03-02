@@ -7,7 +7,7 @@ export class ServicesService {
   private ws:WebSocket;
   private WS_URL:string = "ws://10.10.2.63:8080";
 
-  public _SERVICE_BASE = "http://localhost:5000/";
+  public _SERVICE_BASE:string;
 
   public hardcoded:boolean = false;
 
@@ -15,7 +15,7 @@ export class ServicesService {
   public AUTO_REFRESH_TIME:number = this.AUTO_REFRESH_TIME_MINS * 60 * 100;
 
   constructor(public http: HttpClient, public events:EventsService) {
-
+    
   }
   public getMachines() {
     this.doGet("getFirstLoad","").subscribe(

@@ -35,7 +35,7 @@ export class LeftSideComponent implements OnInit {
     for (let i = 0; i < data.filters.length; i++) {
       let valuesTMP = [];
 
-      for (let j = 0; j < data.filters[i].values.length; j++) valuesTMP.push({label:data.filters[i].values[j].value,value:data.filters[i].values[j].value,propertyname:data.filters[i].values[j].propertyname,check:true})
+      for (let j = 0; j < data.filters[i].values.length; j++) valuesTMP.push({label:data.filters[i].values[j].propertylabel,value:data.filters[i].values[j].value,propertyname:data.filters[i].values[j].propertyname,check:true})
 
       this.filters.push({label: data.filters[i].label, value:data.filters[i].value, values:valuesTMP});
     }

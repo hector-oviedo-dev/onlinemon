@@ -134,6 +134,15 @@ export class DiagramComponent implements OnInit {
           height:this.objectwidth,
         },
       ),
+      //Fondo
+      $(go.Shape, "Circle",
+        new go.Binding("fill", "conncolor"),
+        {
+          margin: new go.Margin(0,35,35,0),
+          width:10,
+          height:10,
+        },
+      ),
       //Texto con UID
       $(go.TextBlock, { margin: 2 },
         new go.Binding("text", "uid"),
@@ -206,7 +215,7 @@ export class DiagramComponent implements OnInit {
         bg.stroke = "gray";
     }
   }
-  public SelectionMoved(e) {/*
+  public SelectionMoved(e) {
     let obj = this.diagram.selection.first() as any;
     if (!obj) return;
 
@@ -220,8 +229,8 @@ export class DiagramComponent implements OnInit {
     obj.Zd.angle = actualR;
 
     let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
-    this.services.sendMessage(JSON.stringify(msg));
-    */
+    //this.services.sendMessage(JSON.stringify(msg));
+
     let msgArr = [];
 
     let selection = this.diagram.selection.toArray();
@@ -280,7 +289,18 @@ export class DiagramComponent implements OnInit {
     obj.Zd.angle = actualR;
 
     let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
-    this.services.sendMessage(JSON.stringify(msg));
+
+    //this.services.sendMessage(JSON.stringify(msg));
+    let data = {
+      uid:actualUID,
+      pos_x:actualX,
+      pos_y:actualY,
+      angle:actualR,
+    }
+    this.services.doPost("update", data).subscribe(
+        res => { this.onUpdateResult(res); },
+        err => { }
+      );
   }
   //Agregar Nueva Maquina
   public onAddMachine(e, obj) {
@@ -318,7 +338,7 @@ export class DiagramComponent implements OnInit {
      obj.part.Zd.angle = actualR;
      let msg = { uid:obj.part.Zd.uid, loc:{ x:actualX, y:actualY }, angle:actualR }
 
-     this.services.sendMessage(JSON.stringify(msg));
+     //this.services.sendMessage(JSON.stringify(msg));
    }
   }
   //Guardar Posicion
@@ -337,24 +357,27 @@ export class DiagramComponent implements OnInit {
 
          let msg = { uid:obj.part.Zd.uid, loc:{ x:actualX, y:actualY }, angle:actualR }
 
-         this.services.sendMessage(JSON.stringify(msg));
+         //this.services.sendMessage(JSON.stringify(msg));
        }
      }
     }
   }
   //Ver Detalles
   public onDetail(e,obj) {
-    let data = { data:obj.part.Zd.uid, service:"onDetail" };
+    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid;
+    let data = { service:"onDetail"+dataSTR,data:null };
     this.events.publish("onPopup", data);
   }
   //Modificar
   public onOnline(e,obj) {
-    let data = { data:obj.part.Zd.uid, service:"onOnline" };
+    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid + "&state=1";
+    let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm"+dataSTR };
     this.events.publish("onPopup", data);
   }
   //Online Programado
   public onProgOffline(e,obj) {
-    let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm" };
+    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid + "&state=0";
+    let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm"+dataSTR };
     this.events.publish("onPopup", data);
   }
   //Online Programado
@@ -480,12 +503,15 @@ export class DiagramComponent implements OnInit {
         label_state:data.maquinas[i].label_state,
         loc: new go.Point(data.maquinas[i].loc.x , data.maquinas[i].loc.y),
         color:data.maquinas[i].color,
+        conncolor:"",
         angle:data.maquinas[i].angle,
         area:data.maquinas[i].area,
         ip:data.maquinas[i].ip+":"+data.maquinas[i].port,
         filters:data.maquinas[i].filters,
         visible:true,
       }
+      if (!data.maquinas[i].filters.connectionstate) obj.conncolor = "red";
+      else obj.conncolor = "green";
 
       let node;
       let valid:boolean = true;
