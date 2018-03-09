@@ -13,11 +13,18 @@ export class LeftSideComponent implements OnInit {
   @ViewChild("uid")
   private uid:ElementRef;
 
+  @ViewChild("grid")
+  private grid:ElementRef;
+
   public views = [ ];
   public filters = [ ];
+  public info;
   public primary:string;
   public secondary:string;
 
+  public blocked:boolean = false;
+
+  public hasblocking:boolean = true;
   constructor(private services:ServicesService) {
     this.events = services.events;
 
@@ -29,16 +36,26 @@ export class LeftSideComponent implements OnInit {
   public onTools(data) {
     this.views = [];
     this.filters = [];
+    this.info = data.info;
 
-    for (let i = 0; i < data.views.length; i++) this.views.push({label: data.views[i].entitylabel, value:data.views[i].value});
+    for (let i = 0; i < data.views.length; i++) this.views.push({label: data.views[i].propertylabel, value:data.views[i].propertyvalue});
 
     for (let i = 0; i < data.filters.length; i++) {
       let valuesTMP = [];
 
-      for (let j = 0; j < data.filters[i].values.length; j++) valuesTMP.push({label:data.filters[i].values[j].propertylabel,value:data.filters[i].values[j].value,propertyname:data.filters[i].values[j].propertyname,check:true})
+      for (let j = 0; j < data.filters[i].values.length; j++) valuesTMP.push({label:data.filters[i].values[j].propertylabel,value:data.filters[i].values[j].propertyvalue,propertyname:data.filters[i].values[j].propertyname,check:true})
 
       this.filters.push({label: data.filters[i].label, value:data.filters[i].value, values:valuesTMP});
     }
+
+    if (data.privileges.position) this.hasblocking = true;
+    else this.hasblocking = false;
+  }
+  public hasBlocking() {
+    return this.hasblocking;
+  }
+  public doView(data) {
+    this.events.publish("onView", data.value);
   }
   public doSearch() {
     console.log("search");
@@ -48,5 +65,10 @@ export class LeftSideComponent implements OnInit {
     if (data.check) data.check = false;
     else data.check = true;
     this.events.publish("onFilter", this.filters);
+  }
+  public doBlock(e) {
+    if (this.blocked) this.blocked = false;
+    else this.blocked = true;
+    this.events.publish("onBlock", !this.blocked);
   }
 }

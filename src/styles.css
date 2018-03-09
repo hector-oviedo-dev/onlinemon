@@ -7,25 +7,27 @@ html, body {
 }
 
 .formBoxValid {
-  min-width:400px;
-  border-radius: 5px;
-  border: 1px solid #488aff;
+  //min-width:100%;
+  //border-radius: 5px;
+  //border: 1px solid #488aff;
 }
 .formBoxInalid {
-  min-width:400px;
-  border-radius: 5px;
-  border: 1px solid #f53d3d;
+  //min-width:100%;
+  //border-radius: 5px;
+  //border: 1px solid #f53d3d;
 }
 .formBoxDisabled {
-  min-width:400px;
-  border-radius: 5px;
-  border: 1px solid #cccccc;
+  //min-width:100%;
+  //border-radius: 5px;
+  //border: 1px solid #cccccc;
 }
 .formTextValid {
-  border: 1px solid #488aff;
+  //min-width:100%;
+  //border: 1px solid #488aff;
 }
 .formTextInalid {
-  border: 1px solid #f53d3d;
+  //min-width:100%;
+  //border: 1px solid #f53d3d;
 }
 .formHelpButton {
   right: 0;

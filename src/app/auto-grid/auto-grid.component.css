@@ -25,3 +25,8 @@ auto-grid {
 .gridRowOdd {
     background-color:lightblue;
 }
+.headerClass {
+  display:flex;
+  justify-content:center;
+  min-width: 175px;
+}

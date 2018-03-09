@@ -1,15 +1,12 @@
-<table [hidden]="_hidden" [ngClass]="[(_valid)?'formBoxValid':'formBoxInalid']">
-  <tr>
-    <td *ngIf="_label != undefined" class="formTextLabel">
-      <label color="primary" *ngIf="_label != 'null'" stacked>{{_label}}</label>
-    </td>
-    <td>
-      <mat-form-field>
-        <input matInput [matDatepicker]="picker" [placeholder]="_placeholder" [(ngModel)]="_value" [disabled]="!_enabled" (ngModelChange)="onChange($event)">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-    </td>
-  </tr>
-</table>
+<div [hidden]="_hidden" [ngClass]="[(_valid)?'formBoxValid':'formBoxInalid']">
+
+  <mat-form-field style="width:100%;">
+    <input matInput [matDatepicker]="picker" [placeholder]="_label" [(ngModel)]="_value" (ngModelChange)="onChange($event)" disabled>
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker disabled="false"></mat-datepicker>
+  </mat-form-field>
+
 <br>
+<mat-divider></mat-divider>
+<br>
+</div>

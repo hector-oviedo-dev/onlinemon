@@ -12,13 +12,15 @@ export class ServicesService {
   public hardcoded:boolean = false;
 
   public AUTO_REFRESH_TIME_MINS:number = 1;
-  public AUTO_REFRESH_TIME:number = this.AUTO_REFRESH_TIME_MINS * 60 * 100;
+  public AUTO_REFRESH_TIME:number = this.AUTO_REFRESH_TIME_MINS * 60 * 1000;
 
+
+  public viewmode:string = "VistaEstado";
   constructor(public http: HttpClient, public events:EventsService) {
-    
+
   }
   public getMachines() {
-    this.doGet("getFirstLoad","").subscribe(
+    this.doGet("getFirstLoad?vista=" + this.viewmode,"").subscribe(
       res => { this.onMachinesResult(res); },
       err => { }
     );
@@ -27,8 +29,6 @@ export class ServicesService {
     //setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
 
     let res = data.json;
-
-    console.log("quisiera hacer un trace... para")
 
     this.events.publish("onMachines", res);
   }

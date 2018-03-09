@@ -51,6 +51,8 @@ export class AutoFormComponent implements OnInit {
 
   }
   public submitClick() {
+    this.events.publish("onSpinner", true);
+
     let data = [];
     for (var i = 0; i < this.components.length; i++) data.push(this.components[i].instance.getValue());
 
@@ -65,7 +67,10 @@ export class AutoFormComponent implements OnInit {
 
   }
   public onServiceResult(result) {
-    console.log(result);/*
+    this.events.publish("onSpinner", false);
+    this.events.publish("onPopupClose", null);
+    this.services.getMachines();
+    /*
     if (result.success == true) console.log("Success");
     else {
       let data = { "MESSAGE":result.error }

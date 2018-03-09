@@ -1,26 +1,18 @@
+<form [formGroup]="_form" [hidden]="_hidden">
+  <div [hidden]="_hidden" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formBoxValid':'formBoxInalid'):'formBoxDisabled'">
 
-<form [formGroup]="_form">
-<table [hidden]="_hidden" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formBoxValid':'formBoxInalid'):'formBoxDisabled'">
-  <tr>
-    <td *ngIf="_label != undefined" class="formTextLabel">
-      <label>{{_label}}</label>
-    </td>
-    <td>
-      <button mat-button positionV="bottom" arrow class="formHelpButton" float-right>?</button>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <mat-form-field>
-        <input matInput formControlName="data" placeholder="{{_placeholder}}" min="{{_min}}" maxlength="{{_max}}" [(ngModel)]="_value" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formTextValid':'formTextInalid'):'formTextDisabled'" (keyup)="onChange($event)">
-      </mat-form-field>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <label color="danger" *ngIf="(!_form.controls['data'].valid && _txt_required != undefined)" stacked  class="formErrorText">* {{_txt_required}}</label>
-    </td>
-  </tr>
-</table>
-<br>
+
+  <mat-form-field style="width:100%;">
+    <input matInput formControlName="data" placeholder="{{_label}}" min="{{_min}}" maxlength="{{_max}}" [(ngModel)]="_value" [ngClass]="(_enabled)?((_form.controls['data'].valid)?'formTextValid':'formTextInalid'):'formTextDisabled'" (keyup)="onChange($event)">
+    <mat-error *ngIf="(!_form.controls['data'].valid && _txt_required != undefined)">
+      * {{_txt_required}}
+    </mat-error>
+  </mat-form-field>
+  
+  <br>
+  <mat-divider></mat-divider>
+  <br>
+
+  </div>
 </form>
+<!--<br>-->

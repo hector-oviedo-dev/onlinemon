@@ -31,7 +31,7 @@ export class LayoutComponent implements OnInit {
   public onAreas(data) {
     this.areas = [];
 
-    for (var i = 0; i < data.length; i++) this.areas.push({label:data[i].entitylabel,area:data[i].value});
+    for (var i = 0; i < data.length; i++) this.areas.push({label:data[i].entitylabel,area:data[i].propertyvalue});
   }
   public onFocusChange(e) {
     //console.log("haschanged: " + this.areas[e.index].label)

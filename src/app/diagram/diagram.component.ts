@@ -15,6 +15,9 @@ export class DiagramComponent implements OnInit {
   private diagramRef: ElementRef;
 
   public objectwidth = 50;
+  public objectheight = 85;
+  public objectspace = 5;
+  public objectmax = 2;
 
   private events: EventsService;
 
@@ -29,8 +32,15 @@ export class DiagramComponent implements OnInit {
   constructor(private services:ServicesService) {
     this.events = services.events;
 
+    this.events.subscribe("onView",(data) => this.onView(data));
     this.events.subscribe("onFilter", (data) => this.onFilter(data));
     this.events.subscribe("onUpdate", (data) => this.onUpdate(data));
+    this.events.subscribe("onBlock", (data) => this.onBlock(data));
+    this.events.subscribe("onPrivileges", (data) => this.onPrivileges(data));
+  }
+  public onView(data) {
+    this.services.viewmode = data;
+    this.services.getMachines();
   }
   public onFilter(data) {
     this.filters = [];
@@ -46,6 +56,16 @@ export class DiagramComponent implements OnInit {
   }
   public onUpdate(data) {
     this.diagram.requestUpdate();
+  }
+  public onBlock(data) {
+    if (this.area == "general") return;
+    if (data) this.diagram.allowMove = true;
+    else this.diagram.allowMove = false;
+
+    this.diagram.toolManager.rotatingTool.isEnabled = this.diagram.allowMove;
+  }
+  public onPrivileges(data) {
+    if (!data.position) this.diagram.allowMove = false;
   }
   ngOnInit() {
     this.start();
@@ -67,7 +87,7 @@ export class DiagramComponent implements OnInit {
     this.diagram = new go.Diagram();
     this.diagram.initialContentAlignment = go.Spot.Center;
 
-    this.diagram.maxSelectionCount = 999;
+    this.diagram.maxSelectionCount = 20;
     this.diagram.undoManager.isEnabled = false;
     this.diagram.toolManager.hoverDelay = 1;
     this.diagram.allowDrop = false;
@@ -135,12 +155,13 @@ export class DiagramComponent implements OnInit {
         },
       ),
       //Fondo
-      $(go.Shape, "Circle",
+      $(go.Shape, "Rectangle",
         new go.Binding("fill", "conncolor"),
         {
-          margin: new go.Margin(0,35,35,0),
-          width:10,
+          margin: new go.Margin(0,0,35,25),
+          width:20,
           height:10,
+          stroke:null
         },
       ),
       //Texto con UID
@@ -179,13 +200,9 @@ export class DiagramComponent implements OnInit {
             ),
           //Modificar
           $("ContextMenuButton",
-            $(go.TextBlock, "Online"),
-            { click: (e, obj) => this.onOnline(e, obj) }
-            ),
-          //Offline Programado
-          $("ContextMenuButton",
-            $(go.TextBlock, "Offline Programado"),
-            { click: (e, obj) => this.onProgOffline(e, obj) }
+            $(go.TextBlock, new go.Binding("text", "offline_prog_label")),
+            { click: (e, obj) => this.onProgOffline(e, obj) },
+
             ),
           //Dar de Baja
           $("ContextMenuButton",
@@ -205,9 +222,11 @@ export class DiagramComponent implements OnInit {
     this.events.subscribe("onMachines",(data) => this.onMachines(data));
 
     this.events.publish("getMachines",'');
+    this.events.publish("getPrivileges",'');
   }
   public onSelectionChanged(obj) {
     var bg = obj.findObject("bg");
+    bg.strokeWidth = 1;
     if (bg !== null) {
       if (obj.isSelected)
         bg.stroke = "blue";
@@ -228,11 +247,6 @@ export class DiagramComponent implements OnInit {
     obj.Zd.loc.y = actualY;
     obj.Zd.angle = actualR;
 
-    let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
-    //this.services.sendMessage(JSON.stringify(msg));
-
-    let msgArr = [];
-
     let selection = this.diagram.selection.toArray();
 
     for (let i = 0; i < selection.length; i++) {
@@ -248,16 +262,6 @@ export class DiagramComponent implements OnInit {
       obj.Zd.loc.y = actualY;
       obj.Zd.angle = actualR;
 
-      msgArr.push({ uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR });
-
-/*
-      let data = new URLSearchParams("");
-      data.set('uid', actualUID);
-      data.set('pos_x', actualX.toString());
-      data.set('pos_y', actualY.toString());
-      data.set('angle', actualR.toString());*/
-
-
       let data = {
         uid:actualUID,
         pos_x:actualX,
@@ -269,8 +273,6 @@ export class DiagramComponent implements OnInit {
           err => { }
         );
     }
-    //console.log(JSON.stringify(msgArr))
-    //this.services.sendMessage(JSON.stringify(msgArr));
   }
   public onUpdateResult(res) {
     console.log(res)
@@ -290,7 +292,6 @@ export class DiagramComponent implements OnInit {
 
     let msg = { uid:actualUID, loc:{ x:actualX, y:actualY }, angle:actualR };
 
-    //this.services.sendMessage(JSON.stringify(msg));
     let data = {
       uid:actualUID,
       pos_x:actualX,
@@ -310,17 +311,6 @@ export class DiagramComponent implements OnInit {
 
     let data = { service:"getAltaForm"+dataSTR,data:null };
     this.events.publish("onPopup", data);
-    /*
-    let diagram = e.diagram;
-    let loc = diagram.toolManager.contextMenuTool.mouseDownPoint;
-    diagram.startTransaction('new node');
-    let data = { uid:"000001", label_state: "offline", loc: { x:loc.x, y:loc.y }, color: "red", angle:0 };
-    diagram.model.addNodeData(data);
-    let part = diagram.findPartForData(data);
-    part.location = diagram.toolManager.contextMenuTool.mouseDownPoint;
-    diagram.commitTransaction('new node');
-
-    this.diagram.requestUpdate();*/
   }
   //Guardar Posicion
   public onSavePositionInstant(e, obj) {
@@ -356,8 +346,6 @@ export class DiagramComponent implements OnInit {
          (this.diagram.model.nodeDataArray[i] as any).angle = actualR;
 
          let msg = { uid:obj.part.Zd.uid, loc:{ x:actualX, y:actualY }, angle:actualR }
-
-         //this.services.sendMessage(JSON.stringify(msg));
        }
      }
     }
@@ -369,16 +357,40 @@ export class DiagramComponent implements OnInit {
     this.events.publish("onPopup", data);
   }
   //Modificar
-  public onOnline(e,obj) {
-    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid + "&state=1";
-    let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm"+dataSTR };
-    this.events.publish("onPopup", data);
-  }
-  //Online Programado
   public onProgOffline(e,obj) {
-    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid + "&state=0";
-    let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm"+dataSTR };
-    this.events.publish("onPopup", data);
+    if (obj.part.Zd.offline_prog_param == "00003") {
+      let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid + "&state=" +obj.part.Zd.offline_prog_param;
+      let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm"+dataSTR };
+      this.events.publish("onPopup", data);
+    } else {
+      this.events.publish("onSpinner", true);
+
+      let data = [
+        {
+          id:"uid",
+          value:obj.part.Zd.uid,
+        },
+        {
+          id:"state",
+          value:obj.part.Zd.offline_prog_param,
+        }
+      ];
+
+      this.services.doPost("offlineprog",data).subscribe(
+        data => {
+          this.events.publish("onSpinner", false);
+          this.services.getMachines();
+          this.diagram.requestUpdate();
+          console.log(data);
+        },
+        err => {
+          let data = { "MESSAGE":"404 Server Address" }
+          //this.navCtrl.push(ErrorPage, data);
+          console.log(data);
+        }
+      );
+
+    }
   }
   //Online Programado
   public onBaja(e,obj) {
@@ -496,22 +508,42 @@ export class DiagramComponent implements OnInit {
     let nodes = [];
     for (let j = 0; j < this.diagram.model.nodeDataArray.length; j++) nodes.push(this.diagram.model.nodeDataArray[j]);
 
+    let ExilonSTEP = 0;
+    let yExilon = 0;
     for (let i = 0; i < data.maquinas.length; i++) {
 
       let obj = {
         uid:data.maquinas[i].uid,
         label_state:data.maquinas[i].label_state,
         loc: new go.Point(data.maquinas[i].loc.x , data.maquinas[i].loc.y),
-        color:data.maquinas[i].color,
-        conncolor:"",
+        color:"#FFFFFF",
+        conncolor:"#FFFFFF",
         angle:data.maquinas[i].angle,
         area:data.maquinas[i].area,
         ip:data.maquinas[i].ip+":"+data.maquinas[i].port,
         filters:data.maquinas[i].filters,
         visible:true,
+        offline_prog_label:"",
+        offline_prog_param:0,
       }
-      if (!data.maquinas[i].filters.connectionstate) obj.conncolor = "red";
-      else obj.conncolor = "green";
+
+      let arrTMP = data.maquinas[i].filters.CambioEstado.split(",");
+
+      obj.offline_prog_label = arrTMP[0];
+      obj.offline_prog_param = arrTMP[1];
+
+      //cambio de fondo en modo de vista
+      if (this.services.viewmode == "VistaEstado") {
+
+        obj.conncolor = data.maquinas[i].color;
+        if (parseInt(data.maquinas[i].filters.Online) == 0) obj.color = "red";
+        else obj.color = "green";
+
+      } else {
+        obj.color = data.maquinas[i].color;
+        if (parseInt(data.maquinas[i].filters.Online) == 0) obj.conncolor = "red";
+        else obj.conncolor = "green";
+      }
 
       let node;
       let valid:boolean = true;
@@ -525,6 +557,22 @@ export class DiagramComponent implements OnInit {
         if (valid) this.addNode(obj, nodes)
         else this.updateNode(obj, node)
       }
+
+
+      if (this.area == "general") {
+        obj.angle = 0;
+        obj.loc.x = ExilonSTEP * (this.objectwidth + this.objectspace);
+        obj.loc.y = yExilon * (this.objectheight + this.objectspace);
+
+        if (valid) this.addNode(obj, nodes)
+        else this.updateNode(obj, node)
+
+        ExilonSTEP++;
+        if (ExilonSTEP >= this.objectmax) {
+          yExilon++;
+          ExilonSTEP = 0;
+        }
+      }
     }
     this.diagram.model.nodeDataArray = nodes;
 
@@ -537,15 +585,25 @@ export class DiagramComponent implements OnInit {
         selectable: false, pickable: false },
       $(go.Picture, "https://upload.wikimedia.org/wikipedia/commons/9/9a/Sample_Floorplan.jpg")
     ));
+
+    if (this.area == "general") {
+      this.diagram.allowMove = false;
+      this.diagram.toolManager.rotatingTool.isEnabled = false;
+      this.diagram.contextMenu = null;
+    }
+    this.diagram.requestUpdate();
   }
   public addNode(obj, nodes) {
     nodes.push(obj);
   }
   public updateNode(obj, node) {
     node.label_state = obj.label_state;
+    node.offline_prog_label = obj.offline_prog_label;
+    node.offline_prog_param = obj.offline_prog_param;
     node.loc = obj.loc;
     node.color = obj.color;
     node.angle = obj.angle;
+    node.conncolor = obj.conncolor;
   }
   public onSearch(data) {
     this.doSearch(data);
@@ -567,15 +625,11 @@ export class DiagramComponent implements OnInit {
         let point  = new go.Point(x,y)
         this.diagram.position = point;
 
-        /*
-        let bg = actualOBJ.port.findObject("bg");
-        if (bg !== null) {
-          if (actualOBJ.port.isSelected)
-            bg.stroke = "blue";
-          else
-            bg.stroke = "gray";
-        }
-        */
+        let obj = this.diagram.findNodeForKey(actualOBJ.key);
+
+        var bg = obj.findObject("bg");
+        (bg as any).stroke = "green";
+        (bg as any).strokeWidth = 3;
       }
     }
   }

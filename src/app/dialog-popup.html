@@ -1,4 +1,4 @@
-<div style="height: 300px;">
-    <!--<app-detail [data]="data"></app-detail>-->
-  <app-container [data]="data"> </app-container>
+<div class="spin" [hidden]="!SPINNER">
+  <mat-progress-spinner mode="indeterminate" [diameter]="30" class="spinMat"></mat-progress-spinner>
 </div>
+<app-container class="containerPopup" [data]="data" [hidden]="SPINNER"></app-container>

@@ -41,6 +41,7 @@ export class ContainerComponent implements OnInit {
     this.doStart();
   }
   public onServiceResult(data) {
+    this.events.publish("onSpinner", false);
     let res = data.json;
 
     if (res.sections.length) {
@@ -70,6 +71,7 @@ export class ContainerComponent implements OnInit {
     }
   }
   public doStart() {
+    this.events.publish("onSpinner", true);
     if (!this.services.hardcoded) {
       this.services.doGet(this.service,"").subscribe(
         data => { this.onServiceResult(data); },

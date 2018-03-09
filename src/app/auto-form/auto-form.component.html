@@ -1,20 +1,11 @@
-<table>
-
-  <tr>
-  <td>
-        <h3>{{_label_title}}</h3>
-  </td>
-</tr>
-  <tr>
-  <td>
-    <ng-template #container>
-    </ng-template>
-  </td>
-</tr>
-
-  <tr>
-  <td>
-    <button mat-button [disabled]="!_valid" (click)="submitClick()">{{_label_submit}}</button>
-  </td>
-</tr>
-</table>
+<mat-card>
+<mat-card-title text-center style="width:100%;">
+    <label text-center>{{_label_title}}</label>
+</mat-card-title>
+<mat-card-content>
+      <ng-template #container></ng-template>
+</mat-card-content>
+<mat-card-footer>
+    <button mat-raised-button [disabled]="!_valid" (click)="submitClick()" style="width:100%;" color="primary">{{_label_submit}}</button>
+</mat-card-footer>
+</mat-card>
