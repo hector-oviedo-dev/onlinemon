@@ -19,6 +19,8 @@ export class AppComponent {
 
   public privileges;
   constructor(public http: HttpClient,private services:ServicesService, public dialog: MatDialog) {
+      services.userID = JSON.parse(localStorage.getItem('usr_id'));
+
       let headers = new HttpHeaders();
       headers = headers.set('Content-Type', 'application/json; charset=utf-8');
 
@@ -28,17 +30,14 @@ export class AppComponent {
 
         this.events = services.events;
         this.events.subscribe("onPopup", (data) => this.onPopup(data));
+        this.events.subscribe("onError", (data) => this.onError(data));
         this.events.subscribe("getPrivileges", (data) => this.onGetPrivileges(data));
 
         //this.services.connect();
 
         this.services.doGet("getFirstLoad","").subscribe(
             res => { this.onServiceResult(res); },
-            err => {
-              //let data = this.createExample();
-              //console.log("MESSAGE 404 Server Address " + JSON.stringify(data));
-              //this.onServiceResult(data);
-            }
+            err => { this.events.publish("onError", "404 Server Error"); }
           );
       });
   }
@@ -46,6 +45,11 @@ export class AppComponent {
     this.events.publish("onPrivileges", this.privileges);
   }
   public onServiceResult(data) {
+    if (!data.success) {
+      this.events.publish("onError", data.message);
+      return;
+    }
+
     let res = data.json;
 
     this.privileges = res.privileges;
@@ -60,9 +64,48 @@ export class AppComponent {
     this.events.publish("onUpdate", "");
   }
   public onPopup(data) {
+      this.popupDialog = this.dialog.open(DialogPopup, { data: data });
+      this.events.publish('onChange', data.service);
+  }
+  public onError(data) {
+    this.events.publish("onPopupClose", "");
+    let sections = [];
+    let form = {
+    	type:"form",
+      controls:[
+        {
+         "id":"msg",
+         "type":"TEXT",
+         "value":data,
+         "hidden":false,
+         "enabled":false,
+         "required":false,
+         "txt_required":"",
+         "txt_error":"",
+         "txt_help":"",
+         "max":15,
+         "min":5,
+         "mask":"",
+         "format":"ALL",
+         "restrict":[],
+         "label":"",
+         "placeholder":data,
+         "display":[]
+       },
+    ],
+    display: {
+       title:"Error",
+       action:"",
+       label_submit:"",
+       label_cancel:""
+     }
+   };
+    sections.push(form);
+    let res = {success:true, json: { sections:sections}};
+
     this.popupDialog = this.dialog.open(DialogPopup, { data: data });
 
-    this.events.publish('onChange', data.service);
+    this.events.publish('onContent', res);
   }
 }
 
@@ -90,7 +133,6 @@ export class DialogPopup {
     ref.onPopupCloseEvt.unsubscribe();
   }
   public onSpin(e) {
-    console.log("SPINNER:" + e);
     if (e) this.SPINNER = true;
     else this.SPINNER = false;
   }

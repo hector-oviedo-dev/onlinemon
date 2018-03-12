@@ -22,7 +22,7 @@ export class LeftSideComponent implements OnInit {
   public primary:string;
   public secondary:string;
 
-  public blocked:boolean = false;
+  public blocked:boolean = true;
 
   public hasblocking:boolean = true;
   constructor(private services:ServicesService) {

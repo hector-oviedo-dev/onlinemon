@@ -24,12 +24,28 @@ export class DiagramComponent implements OnInit {
   @Input()
   public area:string = "";
 
+  @Input() set bg(value) {
+    if (!value) return;
+    const $ = go.GraphObject.make;
+    //background image
+    this.diagram.add(
+    $(go.Part,
+      { layerName: "Background", position: new go.Point(0, 0),
+        selectable: false, pickable: false },
+      $(go.Picture, value)
+    ));
+    console.log("new construction options")
+  };
+
   public activated:boolean = false;
 
   private started:boolean = false;
 
   public filters = [];
   constructor(private services:ServicesService) {
+    const $ = go.GraphObject.make;
+    this.diagram = new go.Diagram();
+
     this.events = services.events;
 
     this.events.subscribe("onView",(data) => this.onView(data));
@@ -37,6 +53,8 @@ export class DiagramComponent implements OnInit {
     this.events.subscribe("onUpdate", (data) => this.onUpdate(data));
     this.events.subscribe("onBlock", (data) => this.onBlock(data));
     this.events.subscribe("onPrivileges", (data) => this.onPrivileges(data));
+
+    console.log("construction complete")
   }
   public onView(data) {
     this.services.viewmode = data;
@@ -84,7 +102,6 @@ export class DiagramComponent implements OnInit {
     const $ = go.GraphObject.make;
     const that = this;
 
-    this.diagram = new go.Diagram();
     this.diagram.initialContentAlignment = go.Spot.Center;
 
     this.diagram.maxSelectionCount = 20;
@@ -223,6 +240,10 @@ export class DiagramComponent implements OnInit {
 
     this.events.publish("getMachines",'');
     this.events.publish("getPrivileges",'');
+
+    //HARDCODED block movement at first time
+    this.diagram.allowMove = false;
+    this.diagram.toolManager.rotatingTool.isEnabled = this.diagram.allowMove;
   }
   public onSelectionChanged(obj) {
     var bg = obj.findObject("bg");
@@ -577,14 +598,6 @@ export class DiagramComponent implements OnInit {
     this.diagram.model.nodeDataArray = nodes;
 
     //for (let j = 0; j < this.diagram.model.nodeDataArray.length; j++) this.updateNode(this.diagram.model.nodeDataArray[j]);
-
-    //background image
-    this.diagram.add(
-    $(go.Part,
-      { layerName: "Background", position: new go.Point(0, 0),
-        selectable: false, pickable: false },
-      $(go.Picture, "https://upload.wikimedia.org/wikipedia/commons/9/9a/Sample_Floorplan.jpg")
-    ));
 
     if (this.area == "general") {
       this.diagram.allowMove = false;

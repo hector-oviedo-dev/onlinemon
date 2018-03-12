@@ -14,6 +14,7 @@ export class ServicesService {
   public AUTO_REFRESH_TIME_MINS:number = 1;
   public AUTO_REFRESH_TIME:number = this.AUTO_REFRESH_TIME_MINS * 60 * 1000;
 
+  public userID:string;
 
   public viewmode:string = "VistaEstado";
   constructor(public http: HttpClient, public events:EventsService) {
@@ -94,7 +95,7 @@ export class ServicesService {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
 
-    let url
+    let url;
     if (absoluteURL) url = service + data;
     else url = this._SERVICE_BASE + service + data;
 

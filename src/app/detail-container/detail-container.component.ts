@@ -6,21 +6,17 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./detail-container.component.css']
 })
 export class DetailContainerComponent implements OnInit {
-  @Input()
-  public data:string = "";
+  @Input() set data(value) { this.rows = value; };
 
   @Input()
   public datatype:string = "";
 
-  public rows = [];
+  public rows;
   constructor() {
-    //this.rows = JSON.parse(this.data);
+
   }
 
   ngOnInit() {
-    try { this.rows = JSON.parse(this.data); }
-    catch (err) { };
 
   }
-
 }

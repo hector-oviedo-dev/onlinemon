@@ -73,14 +73,14 @@
   </mat-expansion-panel-header>
 
   <mat-list-item>
-   <mat-checkbox style="font-size: 12px;" (click)="doBlock($event)">Bloquear Posicionamiento</mat-checkbox>
+   <mat-checkbox style="font-size: 12px;" (click)="doBlock($event)" checked="true">Bloquear Posicionamiento</mat-checkbox>
   </mat-list-item>
 
  </mat-expansion-panel>
  <!--Bloqueo END-->
 
- <mat-list-item>
-  <app-detail-container [data]="info" datatype="detail"></app-detail-container>
- </mat-list-item>
+
+  <app-detail-container [data]="info" datatype="detail" width="80px" style="width:80px !important;"></app-detail-container>
+
 
 </mat-list>

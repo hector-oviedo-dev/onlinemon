@@ -30,8 +30,8 @@ export class LayoutComponent implements OnInit {
   }
   public onAreas(data) {
     this.areas = [];
-
-    for (var i = 0; i < data.length; i++) this.areas.push({label:data[i].entitylabel,area:data[i].propertyvalue});
+    console.log(data)
+    for (var i = 0; i < data.length; i++) this.areas.push({label:data[i].entitylabel,area:data[i].propertyvalue,bg:data[i].plano});
   }
   public onFocusChange(e) {
     //console.log("haschanged: " + this.areas[e.index].label)

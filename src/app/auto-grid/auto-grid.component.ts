@@ -8,9 +8,7 @@ import { ServicesService } from '../services.service';
   styleUrls: ['./auto-grid.component.css']
 })
 export class AutoGridComponent implements OnInit {
-  @Input() set data(value) { this.startProcess(value); };
-
-  //public dataEND:any;
+  @Input() set data(value) { if (value) this.startProcess(value); };
 
   @ViewChild(MatSort) sort: MatSort;
 
