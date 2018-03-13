@@ -1,25 +1,19 @@
-<mat-list-item>
-<table [hidden]="_hidden" [ngClass]="[(_value)?'formBoxValid':'formBoxInalid']">
-  <tr>
-    <td *ngIf="_label != undefined" class="formTextLabel">
-      <label>{{_label}}</label>
-    </td>
-    <td>
-      <button mat-button positionV="bottom" arrow class="formHelpButton" float-right>?</button>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <mat-select [(ngModel)]="_value" (ionChange)="onChange($event)">
-        <mat-option *ngFor="let option of _options" [value]="option.value" [disabled]="!_enabled">{{option.label}}</mat-option>
-      </mat-select>
-    <td>
-  </tr>
-  <tr>
-    <td>
-      <label color="danger" *ngIf="(!_value)" stacked  class="formErrorText">* {{_txt_required}}</label>
-    </td>
-  </tr>
-</table>
-<!--<br>-->
-</mat-list-item>
+<form [formGroup]="_form" [hidden]="_hidden">
+  <div [hidden]="_hidden" [ngClass]="[(_value)?'formBoxValid':'formBoxInalid']">
+
+
+  <mat-form-field style="width:100%;">
+    <mat-select formControlName="data" [(ngModel)]="_value" (change)="onChange($event)" [placeholder]="_label">
+      <mat-option *ngFor="let option of _options" [value]="option.value" [disabled]="!_enabled">{{option.label}}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="!_form.controls['data'].valid">
+      * {{_txt_required}}
+    </mat-error>
+  </mat-form-field>
+
+  <br>
+  <mat-divider></mat-divider>
+  <br>
+
+  </div>
+</form>

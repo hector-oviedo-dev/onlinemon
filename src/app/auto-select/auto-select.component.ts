@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormArray, FormBuilder, Validators, ReactiveFormsModule  } from '@angular/forms';
 import { ServicesService } from '../services.service';
 import { EventsService } from 'angular4-events';
 
@@ -25,12 +26,21 @@ export class AutoSelectComponent implements OnInit {
     public _options = [];
 
     public _valid:boolean;
+
+    public _form:FormGroup;
+
     private events:EventsService;
-    constructor(private services:ServicesService) {
+    constructor(private _fb:FormBuilder, private services:ServicesService) {
       this.events = services.events;
     }
     public createForm() {
+      this._form = this._fb.group({data:[""]});
 
+      if (this._hidden) return;
+
+      let validators = [];
+      if (this._required) validators.push(Validators.required);
+      this._form.controls["data"].setValidators(validators);
     }
     public getValue() {
       return {
@@ -38,11 +48,13 @@ export class AutoSelectComponent implements OnInit {
         value:this._value
       }
     }
-    public onChange(event) {
+    public onChange(e) {
+      console.log(this._value)
       if (this._value) this._valid = true;
       else this._valid = false;
       let data = { id:this._ID, valid:this._valid };
       this.events.publish("onForm", JSON.stringify(data));
+
     }
 
   ngOnInit() {

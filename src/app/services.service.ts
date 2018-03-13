@@ -21,17 +21,19 @@ export class ServicesService {
 
   }
   public getMachines() {
-    this.doGet("getFirstLoad?vista=" + this.viewmode,"").subscribe(
+    this.doGet("getFirstLoad?vista=" + this.viewmode + "&user=" + this.userID,"").subscribe(
       res => { this.onMachinesResult(res); },
-      err => { }
+      err => { setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME); }
     );
   }
   public onMachinesResult(data) {
-    //setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
+    console.log("timmer trigerred");
 
     let res = data.json;
 
     this.events.publish("onMachines", res);
+
+    setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
   }
   public connect() {
 

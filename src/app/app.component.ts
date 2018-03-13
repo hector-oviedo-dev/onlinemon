@@ -27,6 +27,7 @@ export class AppComponent {
       let url = "/assets/config.json";
       this.http.get(url, {headers: headers}).subscribe(res => {
         services._SERVICE_BASE = (res as any).server;
+        services.AUTO_REFRESH_TIME_MINS = (res as any).timmer;
 
         this.events = services.events;
         this.events.subscribe("onPopup", (data) => this.onPopup(data));

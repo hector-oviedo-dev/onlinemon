@@ -218,7 +218,7 @@ export class DiagramComponent implements OnInit {
           //Modificar
           $("ContextMenuButton",
             $(go.TextBlock, new go.Binding("text", "offline_prog_label")),
-            { click: (e, obj) => this.onProgOffline(e, obj) },
+            { click: (e, obj) => this.onChangeState(e, obj) },
 
             ),
           //Dar de Baja
@@ -378,7 +378,11 @@ export class DiagramComponent implements OnInit {
     this.events.publish("onPopup", data);
   }
   //Modificar
-  public onProgOffline(e,obj) {
+  public onChangeState(e,obj) {
+    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid;
+    let data = { data:obj.part.Zd.uid, service:"getChangeStateForm"+dataSTR };
+    this.events.publish("onPopup", data);
+    /*
     if (obj.part.Zd.offline_prog_param == "00003") {
       let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid + "&state=" +obj.part.Zd.offline_prog_param;
       let data = { data:obj.part.Zd.uid, service:"getOfflineProgForm"+dataSTR };
@@ -412,6 +416,7 @@ export class DiagramComponent implements OnInit {
       );
 
     }
+    */
   }
   //Online Programado
   public onBaja(e,obj) {
@@ -550,8 +555,10 @@ export class DiagramComponent implements OnInit {
 
       let arrTMP = data.maquinas[i].filters.CambioEstado.split(",");
 
+      //HARDCODED
       obj.offline_prog_label = arrTMP[0];
       obj.offline_prog_param = arrTMP[1];
+      obj.offline_prog_label = "Cambiar Estado";
 
       //cambio de fondo en modo de vista
       if (this.services.viewmode == "VistaEstado") {
