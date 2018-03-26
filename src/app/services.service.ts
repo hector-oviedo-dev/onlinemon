@@ -15,23 +15,26 @@ export class ServicesService {
   public AUTO_REFRESH_TIME:number = this.AUTO_REFRESH_TIME_MINS * 60 * 1000;
 
   public userID:string;
+  public salaID:string;
 
   public viewmode:string = "VistaEstado";
+
+  public isEditing:boolean = false;
+
+  public date;
   constructor(public http: HttpClient, public events:EventsService) {
 
   }
   public getMachines() {
-    this.doGet("getFirstLoad?vista=" + this.viewmode + "&user=" + this.userID,"").subscribe(
+    this.doGet("getMachines?vista=" + this.viewmode + "&userID=" + this.userID + "&salaID=" + this.salaID + "&date=" + this.date,"").subscribe(
       res => { this.onMachinesResult(res); },
       err => { setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME); }
     );
   }
   public onMachinesResult(data) {
-    console.log("timmer trigerred");
-
     let res = data.json;
 
-    this.events.publish("onMachines", res);
+    if (!this.isEditing) this.events.publish("onMachines", res);
 
     setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
   }
@@ -89,6 +92,9 @@ export class ServicesService {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
 
+    data.push({id:"userID",value:this.userID});
+    data.push({id:"salaID",value:this.salaID});
+
     let url = this._SERVICE_BASE + service;
 
     return this.http.post(url, data, {headers: headers});
@@ -98,7 +104,7 @@ export class ServicesService {
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
 
     let url;
-    if (absoluteURL) url = service + data;
+    if (absoluteURL) url = service + "?userID=" + this.userID + "&salaID=" + this.salaID + data;
     else url = this._SERVICE_BASE + service + data;
 
     return this.http.get(url, {headers: headers});

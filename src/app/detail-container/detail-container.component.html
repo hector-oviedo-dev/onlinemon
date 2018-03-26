@@ -3,17 +3,13 @@
      fxLayoutAlign="center"
 
      fxLayoutGap.xs="0"
-     style="
-     //border-radius: 5px;
-     //border:1px solid gray;
-     margin-left:10px;
-     ">
+     style="margin-left:10px;">
   <div class="item item-1" fxFlex="100%">
 
     <mat-list *ngIf="datatype=='detail'">
      <mat-list-item role="listitem" *ngFor="let row of rows">
-       <div *ngFor="let col of row.cols"  style="margin:0px;" [style.border]="col.border" [style.width]="col.width" [style.text-align]="col.align" [style.font-size]="col.size" [style.color]="col.textcolor" [style.background-color]="col.color">
-         <h5 style="margin:2px;">{{col.label}}</h5>
+       <div *ngFor="let col of row.cols"  style="margin:0px;" [style.border]="col.border" [style.width]="col.width" [style.text-align]="col.align"[style.color]="col.textcolor" [style.background-color]="col.color">
+         <p style="margin:2px;" [style.font-size.px]="col.size">{{col.label}}</p>
        </div>
      <mat-divider></mat-divider>
     </mat-list-item>

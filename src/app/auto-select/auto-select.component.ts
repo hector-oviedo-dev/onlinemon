@@ -49,7 +49,6 @@ export class AutoSelectComponent implements OnInit {
       }
     }
     public onChange(e) {
-      console.log(this._value)
       if (this._value) this._valid = true;
       else this._valid = false;
       let data = { id:this._ID, valid:this._valid };

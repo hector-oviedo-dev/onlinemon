@@ -1,8 +1,21 @@
-<mat-list  class="cont">
-  <mat-list-item class="titleClass"><h4 style="text-align:right">Alertas</h4></mat-list-item>
-  <mat-divider></mat-divider>
+<div class="cont">
 
     <div class="boxClass">
-      <div *ngFor="let alert of alerts" class="boxItem"><div class="boxText">{{alert.label}}</div></div>
+      <div *ngFor="let alert of alerts" [ngClass]="(!alert.Visto)?'boxItem':'boxItemDisabled'">
+        <mat-list-item class="boxHeader"><p class="boxHeaderContent">UID: {{alert.UID}}</p></mat-list-item>
+
+        <mat-list-item class="boxHeader"><p class="boxHeaderContent">{{alert.fecha}}</p></mat-list-item>
+
+        <mat-list-item class="boxBody"><p class="boxBodyContent">{{alert.Mensaje}}</p></mat-list-item>
+
+
+        <mat-list-item class="boxFooterItem">
+          <div class="boxFooterContent">
+            <img src="assets/btnloc.png" (click)="onSearch(alert.UID)">
+            <img src="assets/btncheck.png" alt="" *ngIf="!alert.Visto" (click)="onView(alert.IDAlerta)">
+            <!--<img class="boxClass" src="assets/btncheckdisabled.png" *ngIf="alert.Visto">-->
+          </div>
+        </mat-list-item>
+      </div>
     </div>
-</mat-list>
+</div>

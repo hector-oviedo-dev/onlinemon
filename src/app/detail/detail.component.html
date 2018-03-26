@@ -3,7 +3,7 @@
   <div>
     <mat-list>
        <mat-list-item role="listitem" *ngFor="let side of sides">
-           <h5 *ngFor="let col of side.cols" style="margin:1px;" [style.width]="col.width" [style.border]="col.border" [style.background-color]="col.color">{{col.label}}</h5>
+           <h5 *ngFor="let col of side.cols" style="margin:1px;" [style.width]="col.width" [style.border]="col.border" [style.background-color]="col.color" [style.font-size.px]="col.size">{{col.label}}</h5>
        </mat-list-item>
    </mat-list>
   </div>

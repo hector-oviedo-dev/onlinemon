@@ -69,6 +69,8 @@ export class LeftSideComponent implements OnInit {
   public doBlock(e) {
     if (this.blocked) this.blocked = false;
     else this.blocked = true;
+
+    this.services.isEditing = !this.blocked;
     this.events.publish("onBlock", !this.blocked);
   }
 }

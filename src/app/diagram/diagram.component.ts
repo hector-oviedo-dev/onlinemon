@@ -14,10 +14,10 @@ export class DiagramComponent implements OnInit {
   @ViewChild('diagramDiv')
   private diagramRef: ElementRef;
 
-  public objectwidth = 50;
-  public objectheight = 85;
+  public objectwidth = 40;
+  public objectheight = 80;
   public objectspace = 5;
-  public objectmax = 2;
+  public objectmax = 50;
 
   private events: EventsService;
 
@@ -34,7 +34,6 @@ export class DiagramComponent implements OnInit {
         selectable: false, pickable: false },
       $(go.Picture, value)
     ));
-    console.log("new construction options")
   };
 
   public activated:boolean = false;
@@ -53,8 +52,6 @@ export class DiagramComponent implements OnInit {
     this.events.subscribe("onUpdate", (data) => this.onUpdate(data));
     this.events.subscribe("onBlock", (data) => this.onBlock(data));
     this.events.subscribe("onPrivileges", (data) => this.onPrivileges(data));
-
-    console.log("construction complete")
   }
   public onView(data) {
     this.services.viewmode = data;
@@ -167,32 +164,43 @@ export class DiagramComponent implements OnInit {
         {
           name:"bg",
           stroke:"gray",
-          width:this.objectwidth,
-          height:this.objectwidth,
+          width:35.5,
+          height:27,
+          margin: new go.Margin(0,0,12,0),
         },
       ),
       //Fondo
       $(go.Shape, "Rectangle",
         new go.Binding("fill", "conncolor"),
         {
-          margin: new go.Margin(0,0,35,25),
-          width:20,
-          height:10,
+          margin: new go.Margin(0,0,28.5,19),
+          width:14,
+          height:7.5,
           stroke:null
         },
       ),
       //Texto con UID
-      $(go.TextBlock, { margin: 2 },
-        new go.Binding("text", "uid"),
+      $(go.TextBlock, { margin: 1 },
+        new go.Binding("text", "idbox"),
       ),
       //Silla
       $(go.Picture,
         {
-          source: "assets/chair.png",
-          width:35,
-          height:35,
-          margin: new go.Margin(90,0,0,0),
+          source: "assets/puesto.png",
+          width:40,
+          height:70,
+          margin: new go.Margin(25,0,0,0),
         }
+      ),
+      $(go.Shape, "Rectangle",
+        {
+          name:"selectionstroke",
+          margin: new go.Margin(25,0,0,0),
+          width: 40,
+          height: 70,
+          fill: null,
+          stroke: null,
+        },
       ),
       //ToolTip
       {
@@ -201,6 +209,7 @@ export class DiagramComponent implements OnInit {
           $(go.Shape, { fill: "darkgray" }),
           $(go.Panel, "Vertical",
             $(go.TextBlock, { margin: 3 }, new go.Binding("text", "uid")),
+            $(go.TextBlock, { margin: 3 }, new go.Binding("text", "idbox")),
             $(go.TextBlock, { margin: 3 }, new go.Binding("text", "label_state")),
             $(go.TextBlock, { margin: 3 }, new go.Binding("text", "ip")),
           )
@@ -214,6 +223,12 @@ export class DiagramComponent implements OnInit {
           $("ContextMenuButton",
             $(go.TextBlock, "Ver Detalle"),
             { click: (e, obj) => this.onDetail(e, obj) }
+            ),
+          //Acciones
+          $("ContextMenuButton",
+            $(go.TextBlock, "Acciones"),
+            { click: (e, obj) => this.onActions(e, obj) },
+
             ),
           //Modificar
           $("ContextMenuButton",
@@ -246,13 +261,11 @@ export class DiagramComponent implements OnInit {
     this.diagram.toolManager.rotatingTool.isEnabled = this.diagram.allowMove;
   }
   public onSelectionChanged(obj) {
-    var bg = obj.findObject("bg");
-    bg.strokeWidth = 1;
+    var bg = obj.findObject("selectionstroke");
+    bg.strokeWidth = 2;
     if (bg !== null) {
-      if (obj.isSelected)
-        bg.stroke = "blue";
-      else
-        bg.stroke = "gray";
+      if (obj.isSelected) bg.stroke = "blue";
+      else bg.stroke = null;
     }
   }
   public SelectionMoved(e) {
@@ -270,6 +283,7 @@ export class DiagramComponent implements OnInit {
 
     let selection = this.diagram.selection.toArray();
 
+    let datas = [];
     for (let i = 0; i < selection.length; i++) {
       let obj = selection[i] as any;
       if (!obj) return;
@@ -289,14 +303,18 @@ export class DiagramComponent implements OnInit {
         pos_y:actualY,
         angle:actualR,
       }
-      this.services.doPost("update", data).subscribe(
-          res => { this.onUpdateResult(res); },
-          err => { }
-        );
+
+      datas.push(data);
     }
+
+    this.services.doPost("update", datas).subscribe(
+        res => { this.onUpdateResult(res); },
+        err => { this.events.publish("onError", "404 Server Error"); }
+      );
   }
-  public onUpdateResult(res) {
-    console.log(res)
+  public onUpdateResult(result) {
+    console.log(JSON.stringify(result))
+    if (result.success == false) this.events.publish("onError", result.message);
   }
   public PartRotated(e) {
     let obj = e.subject;
@@ -319,9 +337,11 @@ export class DiagramComponent implements OnInit {
       pos_y:actualY,
       angle:actualR,
     }
-    this.services.doPost("update", data).subscribe(
+    let datas = [];
+    datas.push(data);
+    this.services.doPost("update", datas).subscribe(
         res => { this.onUpdateResult(res); },
-        err => { }
+        err => { this.events.publish("onError", "404 Server Error"); }
       );
   }
   //Agregar Nueva Maquina
@@ -372,13 +392,19 @@ export class DiagramComponent implements OnInit {
     }
   }
   //Ver Detalles
-  public onDetail(e,obj) {
+  public onDetail(e, obj) {
     let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid;
     let data = { service:"onDetail"+dataSTR,data:null };
     this.events.publish("onPopup", data);
   }
+  //Acciones
+  public onActions(e, obj) {
+    let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid;
+    let data = { data:obj.part.Zd.uid, service:"getActionForm"+dataSTR };
+    this.events.publish("onPopup", data);
+  }
   //Modificar
-  public onChangeState(e,obj) {
+  public onChangeState(e, obj) {
     let dataSTR = "?userid="+ " " + "&uid=" + obj.part.Zd.uid;
     let data = { data:obj.part.Zd.uid, service:"getChangeStateForm"+dataSTR };
     this.events.publish("onPopup", data);
@@ -430,6 +456,8 @@ export class DiagramComponent implements OnInit {
     this.events.publish("onPopup", data);
   }
   public onAlignHorizontal(e, ob) {
+    if (!this.diagram.allowMove) return;
+
     let selection = this.diagram.selection.toArray();
     let y = this.diagram.selection.first().position.y;
     for (let i = 0; i < selection.length; i++) {
@@ -438,6 +466,8 @@ export class DiagramComponent implements OnInit {
     this.SelectionMoved(null);
   }
   public onAlignVertical(e, ob) {
+    if (!this.diagram.allowMove) return;
+
     let selection = this.diagram.selection.toArray();
     let x = this.diagram.selection.first().position.x;
     for (let i = 0; i < selection.length; i++) {
@@ -446,13 +476,19 @@ export class DiagramComponent implements OnInit {
     this.SelectionMoved(null);
   }
   public onAlignPropHorizontal(e, ob) {
+    if (!this.diagram.allowMove) return;
+
     let selectionDis = this.diagram.selection.toArray();
 
     let selection = this.sort_by_key_value(selectionDis,'position.x');
 
     let xfirst = selection[0].position.x;
 
-    let xlast = selection[selection.length-1].position.x;
+    for (let i = 0; i < selection.length; i++) if (selection[i].position.x < xfirst) xfirst = selection[i].position.x;
+
+    let xlast = selection[0].position.x;
+
+    for (let i = 0; i < selection.length; i++) if (selection[i].position.x > xlast) xlast = selection[i].position.x;
 
     let diff = xlast - xfirst;
 
@@ -465,13 +501,19 @@ export class DiagramComponent implements OnInit {
     this.SelectionMoved(null);
   }
   public onAlignPropVertical(e, ob) {
+    if (!this.diagram.allowMove) return;
+
     let selectionDis = this.diagram.selection.toArray();
 
     let selection = this.sort_by_key_value(selectionDis,'position.y');
 
     let yfirst = selection[0].position.y;
 
-    let ylast = selection[selection.length-1].position.y;
+    for (let i = 0; i < selection.length; i++) if (selection[i].position.y < yfirst) yfirst = selection[i].position.y;
+
+    let ylast = selection[0].position.y;
+
+    for (let i = 0; i < selection.length; i++) if (selection[i].position.y > ylast) ylast = selection[i].position.y;
 
     let diff = ylast - yfirst;
 
@@ -539,6 +581,7 @@ export class DiagramComponent implements OnInit {
     for (let i = 0; i < data.maquinas.length; i++) {
 
       let obj = {
+        idbox:data.maquinas[i].filters["IDBox"],
         uid:data.maquinas[i].uid,
         label_state:data.maquinas[i].label_state,
         loc: new go.Point(data.maquinas[i].loc.x , data.maquinas[i].loc.y),
@@ -611,6 +654,9 @@ export class DiagramComponent implements OnInit {
       this.diagram.toolManager.rotatingTool.isEnabled = false;
       this.diagram.contextMenu = null;
     }
+
+    this.doFilters();
+
     this.diagram.requestUpdate();
   }
   public addNode(obj, nodes) {
@@ -630,10 +676,10 @@ export class DiagramComponent implements OnInit {
   }
   //Buscar
   public doSearch(uid) {
-    let found:boolean = false;
     for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
       let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
       if (actualOBJ.uid == uid) {
+
         let actualX = parseInt(actualOBJ.loc.x);
         let actualY = parseInt(actualOBJ.loc.y);
 
@@ -647,9 +693,13 @@ export class DiagramComponent implements OnInit {
 
         let obj = this.diagram.findNodeForKey(actualOBJ.key);
 
-        var bg = obj.findObject("bg");
-        (bg as any).stroke = "green";
-        (bg as any).strokeWidth = 3;
+        var bg = obj.findObject("selectionstroke");
+        (bg as any).stroke = "blue";
+        (bg as any).strokeWidth = 2;
+
+        this.events.publish("SearchFound", actualOBJ.area);
+
+        break;
       }
     }
   }

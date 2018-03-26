@@ -2,29 +2,40 @@
 <div fxLayout="row">
 
   <!--Tools-->
-  <mat-drawer-container (close)="updateDiagrams()" (open)="updateDiagrams()">
+  <button *ngIf="tools.opened" class="buttonBack" type="button" mat-raised-button color="primary" (click)="tools.toggle()"><img src="assets/btnopen.png"></button>
+  <mat-sidenav-container (close)="updateDiagrams()" (open)="updateDiagrams()" autosize>
+    <button class="buttonOpen" type="button" mat-raised-button color="primary" (click)="tools.toggle()"><img src="assets/btnclose.png"></button>
 
-    <button class="buttonOpen" type="button" mat-raised-button color="primary" (click)="tools.toggle()">></button>
+    <mat-sidenav #tools mode="side" (close)="updateDiagrams()" (open)="updateDiagrams()" class="sidenavClass">
 
-    <mat-drawer #tools mode="side" (close)="updateDiagrams()" (open)="updateDiagrams()">
-      <button class="buttonBack" type="button" mat-raised-button color="primary" (click)="tools.toggle()"><</button>
       <app-left-side></app-left-side>
-    </mat-drawer>
-  </mat-drawer-container>
+
+    </mat-sidenav>
+
+  </mat-sidenav-container>
+
   <!--End Tools-->
 
   <!--Diagram-->
-  <div style="width:100%;"><app-layout></app-layout></div>
+  <div style="width:100%;">
+      <img *ngIf="hasAlerts=='0'" src="assets\imgalert0.png" align="right" style="position: absolute; right: 20px; top: 10px; z-index: 0;">
+      <img *ngIf="hasAlerts=='1'" src="assets\imgalert1.png" align="right" style="position: absolute; right: 20px; top: 10px; z-index: 0;">
+      <img *ngIf="hasAlerts=='2'" src="assets\imgalert2.png" align="right" style="position: absolute; right: 20px; top: 10px; z-index: 0;">
+      <img *ngIf="this.buttons" src="assets\date.png" align="right" style="position: absolute; right: 50px; top: 10px; z-index: 10;" (click)="openDateFilter()">
+      <img *ngIf="this.services.isEditing && this.buttons" src="assets\warning.png" align="right" alt="Modo De Edicion" style="position: absolute; right: 80px; top: 10px; z-index: 10;">
+
+    <app-layout></app-layout></div>
   <!--End Diagram-->
 
   <!--Alerts-->
-  <mat-drawer-container (close)="updateDiagrams()" (open)="updateDiagrams()">
-    <button class="buttonOpen" type="button" mat-raised-button color="primary" (click)="alerts.toggle()"><</button>
-    <mat-drawer #alerts mode="side"  (close)="updateDiagrams()" (open)="updateDiagrams()">
-      <button class="buttonBack" type="button" mat-raised-button color="primary" (click)="alerts.toggle()">></button>
+  <mat-sidenav-container (close)="updateDiagrams()" (open)="updateDiagrams()" autosize>
+    <button class="buttonOpen" type="button" mat-raised-button color="primary" (click)="alerts.toggle();DisableButtons()"><img src="assets/btnopen.png"></button>
+    <mat-sidenav #alerts mode="side" (close)="updateDiagrams()" (open)="updateDiagrams()" class="sidenavClass">
+
       <app-right-side></app-right-side>
-    </mat-drawer>
-  </mat-drawer-container>
+    </mat-sidenav>
+  </mat-sidenav-container>
+  <button *ngIf="alerts.opened" class="buttonBack" type="button" mat-raised-button color="primary" (click)="alerts.toggle();EnableButtons()"><img src="assets/btnclose.png"></button>
   <!--End Alerts-->
 
 </div>

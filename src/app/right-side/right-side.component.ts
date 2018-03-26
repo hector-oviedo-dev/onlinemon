@@ -18,11 +18,41 @@ export class RightSideComponent implements OnInit {
   }
 
   ngOnInit() {
+
   }
   public onAlerts(data) {
     if (!data.alerts) return;
 
     this.alerts = [];
-    for (let alert of data.alerts) this.alerts.push({type:(alert as any).type,label:(alert as any).label});
+    let visto = true;
+    for (let alert of data.alerts) {
+      let alertDate = new Date(alert.FechaRecepcion);
+      alert.fecha = alertDate.toLocaleString();
+      this.alerts.push(alert);
+
+      if (!alert.Visto) visto = false;
+    }
+    if (!this.alerts.length) this.events.publish("onNewAlerts",0);
+    else {
+      if (visto) this.events.publish("onNewAlerts", 1);
+      else this.events.publish("onNewAlerts", 2);
+    }
+  }
+  public onSearch(data) {
+    this.events.publish("onSearch", data);
+  }
+  public onView(IDAlerta) {
+    this.services.doGet("alertUpdate","&IDAlerta="+IDAlerta).subscribe(
+        res => { this.onServiceResult(res); },
+        err => { this.events.publish("onError", "404 Server Error"); }
+      );
+  }
+  public onServiceResult(data) {
+    console.log(data)
+    if (!data.success) {
+      this.events.publish("onError", data.message);
+      return;
+    }
+    this.services.getMachines();
   }
 }

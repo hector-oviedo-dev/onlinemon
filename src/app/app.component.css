@@ -1,17 +1,36 @@
 .buttonOpen {
+  background-color: #3C4858;
   min-height:100%;
   min-width:15px;
   width:15px;
   padding: 0 0;margin: 0;
   font-size: 12px;
 }
+.sidenavClass {
+  display: flex;
+
+  //align-content: stretch;
+  //align-items: center;
+  //justify-content: center;
+}
+
 .buttonBack {
-  background-color: gray;
-  min-width:100%;
+
+  background-color: #3C4858;
+  min-width:15px;
+  width:15px;
+  padding: 0 0;margin: 0;
+  font-size: 12px;
+  min-height:46px;
+}
+.buttonBackLeft {
+  background-color: #3C4858;
+  width:100%;
   padding: 0 0;
   margin: 0;
   font-size: 12px;
   min-height:46px;
+  //text-align: left;
 }
 .spin {
   position: fixed;
@@ -30,4 +49,7 @@
 .containerPopup {
   min-height: 10vh;
   min-width: 70vw;
+}
+.crox {
+  float: right;
 }

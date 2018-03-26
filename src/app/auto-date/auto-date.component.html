@@ -1,10 +1,15 @@
 <div [hidden]="_hidden" [ngClass]="[(_valid)?'formBoxValid':'formBoxInalid']">
 
   <mat-form-field style="width:100%;">
-    <input matInput [matDatepicker]="picker" [placeholder]="_label" [(ngModel)]="_value" (ngModelChange)="onChange($event)" disabled>
+    <input matInput [matDatepicker]="picker" [placeholder]="_label" [(ngModel)]="_valueDate" (ngModelChange)="onChange($event)" disabled>
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker disabled="false"></mat-datepicker>
   </mat-form-field>
+
+  <mat-form-field *ngIf="!_hideTime" style="width:100%;">
+    <input matInput [placeholder]="_labelTime" [(ngModel)]="_placeholderTime" (ngModelChange)="onChange($event)" disabled>
+  </mat-form-field>
+  <dp-time-select *ngIf="!_hideTime" [(ngModel)]="_valueTime" (ngModelChange)="onChange($event)" [config]="config" #timePicker></dp-time-select>
 
 <br>
 <mat-divider></mat-divider>

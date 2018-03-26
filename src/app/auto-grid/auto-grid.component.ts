@@ -42,7 +42,12 @@ export class AutoGridComponent implements OnInit {
 
       if (data.titles[i].ColumnaVisible == "true") {
         this.displayedColumns.push(data.titles[i].ColumnaNombre);
-        this.cols.push({def:data.titles[i].ColumnaNombre,label:data.titles[i].ColumnaEtiqueta,type:data.titles[i].ColumnaTipoDato});
+
+        let style = data.titles[i].ColumnaAlineacion;
+
+        console.log("data.titles[i].ColumnaNombre",style)
+
+        this.cols.push({def:data.titles[i].ColumnaNombre,label:data.titles[i].ColumnaEtiqueta,type:data.titles[i].ColumnaTipoDato, style:style});
       }
     }
     let dataS: Element[] = [];
@@ -63,13 +68,6 @@ export class AutoGridComponent implements OnInit {
       }
 
       dataS.push(obj);
-
-      //if (this.cols[i].type == "DateTime") {
-        //let fecha = obj[this.cols[i].def];
-        //console.log(obj)
-        //obj[this.cols[i].def] = fecha.toISOString().replace(/T/, ' ').replace(/\..+/, '');
-      //}
-
     }
 
      this.dataSource = new MatTableDataSource(dataS);

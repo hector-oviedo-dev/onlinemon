@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule, FormGroup, FormControl,ReactiveFormsModule } from '@angular/forms';
 import { EventsModule } from 'angular4-events';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule, Routes, ActivatedRoute } from '@angular/router';
+import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 import { FlexLayoutModule } from "@angular/flex-layout";
 import {
@@ -24,6 +26,7 @@ import {
   MatMenuModule,
   MatNativeDateModule,
   MatPaginatorModule,
+  MatPaginatorIntl,
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatRadioModule,
@@ -43,6 +46,8 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material';
+
+import { getPaginatorIntl } from './paginator-intl';
 
 import { AgGridModule } from "ag-grid-angular/main";
 
@@ -72,6 +77,7 @@ import { ErrorComponent } from './error/error.component';
 import { DetailComponent } from './detail/detail.component';
 import { DetailContainerComponent } from './detail-container/detail-container.component';
 
+import { DpDatePickerModule } from 'ng2-date-picker';
 
 @NgModule({
   declarations: [
@@ -115,6 +121,7 @@ import { DetailContainerComponent } from './detail-container/detail-container.co
   imports: [
     HttpClientModule,
     EventsModule.forRoot(),
+    RouterModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -154,10 +161,13 @@ import { DetailContainerComponent } from './detail-container/detail-container.co
     MatToolbarModule,
     MatTooltipModule,
 
+    DpDatePickerModule,
+
     AgGridModule.withComponents([])
   ],
   providers: [
      ServicesService,
+     { provide: MatPaginatorIntl, useValue: getPaginatorIntl() },
      { provide: MAT_DIALOG_DATA, useValue: {} },
      { provide: MatDialogRef, useValue: {} }
     ],

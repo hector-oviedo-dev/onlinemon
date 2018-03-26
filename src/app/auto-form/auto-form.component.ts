@@ -34,9 +34,14 @@ export class AutoFormComponent implements OnInit {
   public _controls = [];
 
   private events:EventsService;
+
+  public txtError:string;
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private services:ServicesService) {
     this.events = this.services.events;
     this.events.subscribe('onForm', (obj) => { this.onForm(obj); });
+  }
+  public onCloseClick() {
+    this.events.publish("onPopupClose", "");
   }
   //this.events.unsubscribe('onForm');
   public onForm(objSTR) {
@@ -45,38 +50,47 @@ export class AutoFormComponent implements OnInit {
     for (let i = 0; i < this._controls.length;i++) {
       if (this._controls[i].id == obj.id) this._controls[i].valid = obj.valid;
       if (!this._controls[i].valid) this._valid = false;
-
-      console.log("id " + this._controls[i].id  + "valid " + this._controls[i].valid)
     }
 
   }
   public submitClick() {
-    this.events.publish("onSpinner", true);
+    this.txtError = null;
+    if (this._action == "") {
+      this.events.publish("onPopupClose", "");
+      this.events.publish("onSpinner", true);
+      return;
+    }
+    //this.events.publish("onSpinner", true);
 
     let data = [];
     for (var i = 0; i < this.components.length; i++) data.push(this.components[i].instance.getValue());
 
     this.services.doPost(this._action,data).subscribe(
       data => { this.onServiceResult(data); },
-      err => {
-        let data = { "MESSAGE":"404 Server Address" }
-        //this.navCtrl.push(ErrorPage, data);
-        console.log(data);
-      }
+      err => { this.events.publish("onError", "404 Server Error"); }
     );
 
   }
   public onServiceResult(result) {
-    this.events.publish("onSpinner", false);
-    this.events.publish("onPopupClose", null);
-    this.services.getMachines();
-    /*
-    if (result.success == true) console.log("Success");
-    else {
-      let data = { "MESSAGE":result.error }
-      //this.navCtrl.push(ErrorPage, data);
-      console.log(data);
-    }*/
+
+    if (result.success == true) {
+      this.events.publish("onSpinner", false);
+      this.events.publish("onSuccess", result.message);
+
+      //PARCHE/HARDCODED para guardar fecha
+      if (result.isDate) {
+        this.services.date = result.date;
+        this.services.onMachinesResult(result);
+      }
+      /////////////////////////////////////
+    } else {
+      //console.log(JSON.stringify(result));
+      this.txtError =JSON.stringify(result.message);
+      ///this.events.publish("onSpinner", false);
+      //this.events.publish("onError", result.message);
+    }
+
+    //this.services.getMachines();
   }
   public cancelClick() {
 
@@ -98,9 +112,8 @@ export class AutoFormComponent implements OnInit {
           arr = ["id","value","hidden","enabled","required","txt_required","txt_error","txt_help","min","max","mask","format","label","placeholder"];
           result = (this.validateComponent(this.values[i],arr));
           if (!result.valid) {
-            let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
-            //this.navCtrl.push(ErrorPage, data);
-            console.log(data);
+            let msg = "MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing;
+            this.events.publish("onError", msg);
             return;
           } else this.addInput(this.values[i]);
 
@@ -110,9 +123,8 @@ export class AutoFormComponent implements OnInit {
           arr = ["id","value","hidden","enabled","required","txt_required","txt_error","txt_help","min","max","mask","format","label","placeholder"];
           result = (this.validateComponent(this.values[i],arr));
           if (!result.valid) {
-            let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
-            //this.navCtrl.push(ErrorPage, data);
-            console.log(data);
+            let msg = "MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing;
+            this.events.publish("onError", msg);
             return;
           } else this.addInput(this.values[i]);
 
@@ -124,9 +136,8 @@ export class AutoFormComponent implements OnInit {
           arr = ["id","value","hidden","enabled","required","txt_help","label"];
           result = (this.validateComponent(this.values[i],arr));
           if (!result.valid) {
-            let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
-            //this.navCtrl.push(ErrorPage, data);
-            console.log(data);
+            let msg = "MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing;
+            this.events.publish("onError", msg);
             return;
           } else this.addCheckbox(this.values[i]);
 
@@ -137,9 +148,9 @@ export class AutoFormComponent implements OnInit {
           result = (this.validateComponent(this.values[i],arr));
 
           if (!result.valid) {
-            let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
+            let msg = "MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing;
             //this.navCtrl.push(ErrorPage, data);
-            console.log(data);
+            this.events.publish("onError", msg);
             return;
           } else this.addCheckboxlist(this.values[i]);
 
@@ -149,9 +160,8 @@ export class AutoFormComponent implements OnInit {
           result = (this.validateComponent(this.values[i],arr));
 
           if (!result.valid) {
-            let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
-            //this.navCtrl.push(ErrorPage, data);
-            console.log(data);
+            let msg = "MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing;
+            this.events.publish("onError", msg);
             return;
           } else this.addRadio(this.values[i]);
 
@@ -161,9 +171,8 @@ export class AutoFormComponent implements OnInit {
           result = (this.validateComponent(this.values[i],arr));
 
           if (!result.valid) {
-            let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
-            //this.navCtrl.push(ErrorPage, data);
-            console.log(data);
+            let msg = "MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing
+            this.events.publish("onError", msg);
             return;
           } else this.addSelect(this.values[i]);
 
@@ -173,9 +182,8 @@ export class AutoFormComponent implements OnInit {
             result = (this.validateComponent(this.values[i],arr));
 
             if (!result.valid) {
-              let data = { "MESSAGE":"MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing }
-              //this.navCtrl.push(ErrorPage, data);
-              console.log(data);
+              let msg = "MalFormed: Missing at object of type: " + this.values[i].type + " objects: " + result.missing;
+              this.events.publish("onError", msg);
               return;
             } else this.addDate(this.values[i]);
 
@@ -195,6 +203,8 @@ export class AutoFormComponent implements OnInit {
       if (this.values[i].hidden) control.valid = true;
       this._controls.push(control);
     }
+
+    if (this._action == "") this._valid = true;
   }
   public validateComponent(obj, arr) {
     let result = {valid:true, missing:[] }
@@ -286,10 +296,14 @@ export class AutoFormComponent implements OnInit {
     (<AutoDateComponent>component.instance)._mask        = value.mask;
     (<AutoDateComponent>component.instance)._format      = value.format;
 
+    (<AutoDateComponent>component.instance)._hideTime    = value.hideTime;
+
     for (let i = 0; i < value.restrict.length; i++) (<AutoDateComponent>component.instance)._restrict.push(value.restrict[i]);
 
     (<AutoDateComponent>component.instance)._label       = value.label;
+    (<AutoDateComponent>component.instance)._labelTime   = value.labelTime;
     (<AutoDateComponent>component.instance)._placeholder = value.placeholder;
+    (<AutoDateComponent>component.instance)._placeholderTime = value.placeholderTime;
 
     //(<AutoDateComponent>component.instance).createForm();
 
@@ -334,8 +348,6 @@ export class AutoFormComponent implements OnInit {
 
     (<AutoChecklistComponent>component.instance)._label       = value.label;
 
-    console.log("el texto es:" + value.label)
-
     for (let i = 0; i < value.values.length; i++) {
       let option = {
         label:value.values[i].label,
@@ -359,7 +371,6 @@ export class AutoFormComponent implements OnInit {
     let values = data.json
 
     for (let i = 0; i < values.length; i++) {
-      console.log(values[i])
       let option = {
         label:values[i].descripcion,
         value:values[i].id,

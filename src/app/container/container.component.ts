@@ -35,6 +35,9 @@ export class ContainerComponent implements OnInit {
     this.onChangeEvt = this.events.subscribe('onChange', (content) => { this.onChange(content); });
     this.onContentEvt = this.events.subscribe('onContent', (content) => { this.onContent(content); });
   }
+  public onCloseClick() {
+    this.events.publish("onPopupClose", "");
+  }
   public ngOnDestroy() {
     this.onChangeEvt.unsubscribe();
     this.onContentEvt.unsubscribe();

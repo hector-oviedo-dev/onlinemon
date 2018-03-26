@@ -1,19 +1,18 @@
 <mat-list class="cont">
-  <mat-list-item class="titleClass"><h4>Herramientas</h4></mat-list-item>
-  <mat-divider></mat-divider>
+
 
 <!--Views START-->
 <mat-expansion-panel hideToggle="true">
 
-<mat-expansion-panel-header  style="background-color:lightgray">
- <mat-panel-title>
+<mat-expansion-panel-header class="EXtitleClass">
+ <mat-panel-title class="EXtitleClassText">
    Visualizacion
  </mat-panel-title>
 </mat-expansion-panel-header>
 
 <mat-radio-group>
- <mat-list-item *ngFor="let view of views;let first = first;">
-   <mat-radio-button style="font-size: 12px;" [value]="view.value" [checked]="first" (click)="doView(view)">{{view.label}}</mat-radio-button>
+ <mat-list-item *ngFor="let view of views;let first = first;" class="EXbodyClass">
+   <mat-radio-button [value]="view.value" [checked]="first" (click)="doView(view)" class="EXbodyClass">{{view.label}}</mat-radio-button>
  </mat-list-item>
 </mat-radio-group>
 
@@ -24,18 +23,18 @@
  <!--Filtros START-->
  <mat-expansion-panel hideToggle="true">
 
-   <mat-expansion-panel-header  style="background-color:lightgray">
-     <mat-panel-title>
+   <mat-expansion-panel-header class="EXtitleClass">
+     <mat-panel-title class="EXtitleClassText">
        Filtros
      </mat-panel-title>
    </mat-expansion-panel-header>
    <br>
    <div *ngFor="let filter of filters" class="filterBox">
 
-    <label><i><b>{{filter.label}}</b></i><mat-divider></mat-divider></label>
+    <label class="EXbodyClass"><i><b>{{filter.label}}</b></i><mat-divider></mat-divider></label>
 
-    <mat-list-item *ngFor="let sub of filter.values">
-     <mat-checkbox style="font-size: 12px;" [value]="sub.value" [checked]="true" (click)="doFilter(sub)">{{sub.label}}</mat-checkbox>
+    <mat-list-item *ngFor="let sub of filter.values" class="EXbodyClass">
+     <mat-checkbox [value]="sub.value" [checked]="true" (click)="doFilter(sub)" class="EXbodyClass">{{sub.label}}</mat-checkbox>
     </mat-list-item>
 
    </div>
@@ -46,17 +45,17 @@
 
  <!--Busqueda START-->
 <mat-expansion-panel hideToggle="true">
-  <mat-expansion-panel-header  style="background-color:lightgray">
-    <mat-panel-title>
+  <mat-expansion-panel-header class="EXtitleClass">
+    <mat-panel-title class="EXtitleClassText">
       Buscar
     </mat-panel-title>
   </mat-expansion-panel-header>
 
   <div>
     <br>
-    <mat-list>
-      <mat-list-item><mat-form-field><input matInput placeholder="UID" id="uid" #uid></mat-form-field></mat-list-item>
-      <mat-list-item><button mat-raised-button color="primary" (click)="doSearch()">Buscar</button></mat-list-item>
+    <mat-list class="EXbodyClass">
+      <mat-list-item class="EXbodyClass"><mat-form-field><input matInput placeholder="UID" id="uid" #uid></mat-form-field></mat-list-item>
+      <mat-list-item class="EXbodyClass"><button class="classicButton" type="button" mat-raised-button color="primary" (click)="doSearch()">Buscar</button></mat-list-item>
     </mat-list>
   </div>
 
@@ -66,14 +65,14 @@
 
  <!--Bloqueo START-->
  <mat-expansion-panel hideToggle="true" *ngIf="hasBlocking()">
-  <mat-expansion-panel-header  style="background-color:lightgray">
-    <mat-panel-title>
+  <mat-expansion-panel-header class="EXtitleClass">
+    <mat-panel-title class="EXtitleClassText">
       Bloquear
     </mat-panel-title>
   </mat-expansion-panel-header>
 
   <mat-list-item>
-   <mat-checkbox style="font-size: 12px;" (click)="doBlock($event)" checked="true">Bloquear Posicionamiento</mat-checkbox>
+   <mat-checkbox (click)="doBlock($event)" checked="true" class="EXbodyClass">Bloquear Posicionamiento</mat-checkbox>
   </mat-list-item>
 
  </mat-expansion-panel>
