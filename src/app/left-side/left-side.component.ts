@@ -16,8 +16,11 @@ export class LeftSideComponent implements OnInit {
   @ViewChild("grid")
   private grid:ElementRef;
 
+  public menuLabels;
+
   public views = [ ];
   public filters = [ ];
+  public search = [ ];
   public info;
   public primary:string;
   public secondary:string;
@@ -25,6 +28,8 @@ export class LeftSideComponent implements OnInit {
   public blocked:boolean = true;
 
   public hasblocking:boolean = true;
+
+  public _buscarID:string;
   constructor(private services:ServicesService) {
     this.events = services.events;
 
@@ -36,7 +41,10 @@ export class LeftSideComponent implements OnInit {
   public onTools(data) {
     this.views = [];
     this.filters = [];
+    this.search = [];
     this.info = data.info;
+
+    this.menuLabels = data.menutranslation;
 
     for (let i = 0; i < data.views.length; i++) this.views.push({label: data.views[i].propertylabel, value:data.views[i].propertyvalue});
 
@@ -47,6 +55,15 @@ export class LeftSideComponent implements OnInit {
 
       this.filters.push({label: data.filters[i].label, value:data.filters[i].value, values:valuesTMP});
     }
+
+    for (let i = 0; i < data.search.length; i++) {
+      //let valuesTMP = [];
+
+      //for (let j = 0; j < data.search[i].values.length; j++) valuesTMP.push({label:data.search[i].values[j].propertylabel,value:data.search[i].values[j].propertyvalue,propertyname:data.search[i].values[j].propertyname,check:true})
+      this.search.push(data.search[i]);
+    }
+
+    this._buscarID = data.search[0].entitylabel;
 
     if (data.privileges.position) this.hasblocking = true;
     else this.hasblocking = false;
@@ -59,7 +76,7 @@ export class LeftSideComponent implements OnInit {
   }
   public doSearch() {
     console.log("search");
-    this.events.publish("onSearch", this.uid.nativeElement.value);
+    this.events.publish("onSearch", this._buscarID+","+this.uid.nativeElement.value);
   }
   public doFilter(data) {
     if (data.check) data.check = false;

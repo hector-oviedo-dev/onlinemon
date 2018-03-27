@@ -6,7 +6,7 @@
 
 <mat-expansion-panel-header class="EXtitleClass">
  <mat-panel-title class="EXtitleClassText">
-   Visualizacion
+   {{menuLabels.views.label}}
  </mat-panel-title>
 </mat-expansion-panel-header>
 
@@ -25,7 +25,7 @@
 
    <mat-expansion-panel-header class="EXtitleClass">
      <mat-panel-title class="EXtitleClassText">
-       Filtros
+       {{menuLabels.filters.label}}
      </mat-panel-title>
    </mat-expansion-panel-header>
    <br>
@@ -47,16 +47,30 @@
 <mat-expansion-panel hideToggle="true">
   <mat-expansion-panel-header class="EXtitleClass">
     <mat-panel-title class="EXtitleClassText">
-      Buscar
+      {{menuLabels.search.label}}
     </mat-panel-title>
   </mat-expansion-panel-header>
 
   <div>
     <br>
-    <mat-list class="EXbodyClass">
-      <mat-list-item class="EXbodyClass"><mat-form-field><input matInput placeholder="UID" id="uid" #uid></mat-form-field></mat-list-item>
-      <mat-list-item class="EXbodyClass"><button class="classicButton" type="button" mat-raised-button color="primary" (click)="doSearch()">Buscar</button></mat-list-item>
-    </mat-list>
+    <div class="EXbodyClass">
+
+      <div style="width:60%;">
+
+        <mat-form-field style="width:100%;">
+          <mat-select [(ngModel)]="_buscarID" [placeholder]="search[0].entitylabel"  style="width:100%;">
+            <mat-option *ngFor="let option of search" [value]="option.propertyname">{{option.propertylabel}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <br>
+        <mat-form-field style="width:100%;">
+          <input matInput [placeholder]="_buscarID" id="uid" #uid>
+        </mat-form-field>
+        <br>
+        <button class="classicButton" type="button" mat-raised-button color="primary" style="width:100%;" (click)="doSearch()">{{menuLabels.search.label}}</button>
+
+      </div>
+    </div>
   </div>
 
 </mat-expansion-panel>
@@ -67,12 +81,12 @@
  <mat-expansion-panel hideToggle="true" *ngIf="hasBlocking()">
   <mat-expansion-panel-header class="EXtitleClass">
     <mat-panel-title class="EXtitleClassText">
-      Bloquear
+      {{menuLabels.lock.label}}
     </mat-panel-title>
   </mat-expansion-panel-header>
 
   <mat-list-item>
-   <mat-checkbox (click)="doBlock($event)" checked="true" class="EXbodyClass">Bloquear Posicionamiento</mat-checkbox>
+   <mat-checkbox (click)="doBlock($event)" checked="true" class="EXbodyClass">{{menuLabels.lock.checkboxLabel}}</mat-checkbox>
   </mat-list-item>
 
  </mat-expansion-panel>

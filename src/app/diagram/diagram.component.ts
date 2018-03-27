@@ -675,10 +675,11 @@ export class DiagramComponent implements OnInit {
     this.doSearch(data);
   }
   //Buscar
-  public doSearch(uid) {
+  public doSearch(data) {
+    let params = data.split(",");
     for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
       let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
-      if (actualOBJ.uid == uid) {
+      if (actualOBJ.filters[params[0]] == params[1]) {
 
         let actualX = parseInt(actualOBJ.loc.x);
         let actualY = parseInt(actualOBJ.loc.y);
