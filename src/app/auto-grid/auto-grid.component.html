@@ -4,8 +4,8 @@
 
     <!-- Position Column -->
     <ng-container *ngFor="let col of cols;" [matColumnDef]="col.def">
-      <mat-header-cell *matHeaderCellDef mat-sort-header class="headerClass">{{col.label}}</mat-header-cell>
-      <mat-cell *matCellDef="let element" style="display:flex;" [style.text-align]='col.style' [style.justify-content]='col.style'> {{element[col.def]}} </mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header class="headerClass" [fxFlex]="col.width">{{col.label}}</mat-header-cell>
+      <mat-cell *matCellDef="let element" [style.text-align]='col.style' [style.justify-content]='col.style' [fxFlex]="col.width"> {{element[col.def]}} </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

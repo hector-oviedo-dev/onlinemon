@@ -25,18 +25,18 @@ export class ServicesService {
   constructor(public http: HttpClient, public events:EventsService) {
 
   }
-  public getMachines() {
+  public getMachines(recall = true) {
     this.doGet("getMachines?vista=" + this.viewmode + "&userID=" + this.userID + "&salaID=" + this.salaID + "&date=" + this.date,"").subscribe(
-      res => { this.onMachinesResult(res); },
+      res => { this.onMachinesResult(res,recall); },
       err => { setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME); }
     );
   }
-  public onMachinesResult(data) {
+  public onMachinesResult(data,recall) {
     let res = data.json;
 
     if (!this.isEditing) this.events.publish("onMachines", res);
 
-    setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
+    if (recall) setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
   }
   public connect() {
 

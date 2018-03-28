@@ -39,15 +39,17 @@ export class AutoGridComponent implements OnInit {
     this.displayedColumns = [];
 
     for (let i = 0; i < data.titles.length;i++) {
+      console.log(data.titles[i])
 
       if (data.titles[i].ColumnaVisible == "true") {
+
         this.displayedColumns.push(data.titles[i].ColumnaNombre);
 
         let style = data.titles[i].ColumnaAlineacion;
 
-        console.log("data.titles[i].ColumnaNombre",style)
+        let width = data.titles[i].ColumnaAncho + "px";
 
-        this.cols.push({def:data.titles[i].ColumnaNombre,label:data.titles[i].ColumnaEtiqueta,type:data.titles[i].ColumnaTipoDato, style:style});
+        this.cols.push({def:data.titles[i].ColumnaNombre,label:data.titles[i].ColumnaEtiqueta,type:data.titles[i].ColumnaTipoDato, style:style, width:width});
       }
     }
     let dataS: Element[] = [];

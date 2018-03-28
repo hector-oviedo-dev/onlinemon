@@ -80,7 +80,7 @@ export class AutoFormComponent implements OnInit {
       //PARCHE/HARDCODED para guardar fecha
       if (result.isDate) {
         this.services.date = result.date;
-        this.services.onMachinesResult(result);
+        this.services.onMachinesResult(result, false);
       }
       /////////////////////////////////////
     } else {

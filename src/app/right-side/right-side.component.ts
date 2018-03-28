@@ -39,10 +39,10 @@ export class RightSideComponent implements OnInit {
     }
   }
   public onSearch(data) {
-    this.events.publish("onSearch", data);
+    this.events.publish("onSearch", "UID,"+data);
   }
   public onView(IDAlerta) {
-    this.services.doGet("alertUpdate","&IDAlerta="+IDAlerta).subscribe(
+    this.services.doGet("alertUpdate","?IDAlerta="+IDAlerta).subscribe(
         res => { this.onServiceResult(res); },
         err => { this.events.publish("onError", "404 Server Error"); }
       );

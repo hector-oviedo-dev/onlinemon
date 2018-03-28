@@ -36,9 +36,16 @@ export class DiagramComponent implements OnInit {
     ));
   };
 
+  @Input() set bgColor(value) {
+    if (!value) return;
+    this.bgcol = value;
+  };
+
   public activated:boolean = false;
 
   private started:boolean = false;
+
+  public bgcol = "#CCCCCC";
 
   public filters = [];
   constructor(private services:ServicesService) {
@@ -73,9 +80,29 @@ export class DiagramComponent implements OnInit {
     this.diagram.requestUpdate();
   }
   public onBlock(data) {
-    if (this.area == "general") return;
-    if (data) this.diagram.allowMove = true;
-    else this.diagram.allowMove = false;
+    if (data && this.area !="general") {
+
+      this.diagram.allowMove = true;
+
+      for (let i = 0; i < this.diagram.model.nodeDataArray.length; i++) {
+
+        let actualOBJ = this.diagram.model.nodeDataArray[i] as any;
+
+        let obj = this.diagram.findNodeForKey(actualOBJ.key);
+
+        var bg = obj.findObject("bg") as any;
+        bg.fill = "#FFFFFF";
+
+        var bgconn = obj.findObject("bgconn") as any;
+        bgconn.fill = "#FFFFFF";
+      }
+
+
+    } else {
+      this.diagram.allowMove = false;
+
+      this.services.getMachines(false);
+    }
 
     this.diagram.toolManager.rotatingTool.isEnabled = this.diagram.allowMove;
   }
@@ -163,7 +190,7 @@ export class DiagramComponent implements OnInit {
         new go.Binding("fill", "color"),
         {
           name:"bg",
-          stroke:"gray",
+          stroke:null,
           width:35.5,
           height:27,
           margin: new go.Margin(0,0,12,0),
@@ -173,6 +200,7 @@ export class DiagramComponent implements OnInit {
       $(go.Shape, "Rectangle",
         new go.Binding("fill", "conncolor"),
         {
+          name:"bgconn",
           margin: new go.Margin(0,0,28.5,19),
           width:14,
           height:7.5,
@@ -185,8 +213,9 @@ export class DiagramComponent implements OnInit {
       ),
       //Silla
       $(go.Picture,
+        new go.Binding("source", "imgsource"),
         {
-          source: "assets/puesto.png",
+          name:"img",
           width:40,
           height:70,
           margin: new go.Margin(25,0,0,0),
@@ -594,7 +623,12 @@ export class DiagramComponent implements OnInit {
         visible:true,
         offline_prog_label:"",
         offline_prog_param:0,
+        imgsource:""
       }
+      if (data.maquinas[i].filters["ImagenMonitoreo"] != "null") obj.imgsource = "assets/" + data.maquinas[i].filters["ImagenMonitoreo"];
+      else obj.imgsource = "assets/puesto.png";
+
+      console.log(" i ",i + obj.imgsource)
 
       let arrTMP = data.maquinas[i].filters.CambioEstado.split(",");
 
@@ -607,13 +641,13 @@ export class DiagramComponent implements OnInit {
       if (this.services.viewmode == "VistaEstado") {
 
         obj.conncolor = data.maquinas[i].color;
-        if (parseInt(data.maquinas[i].filters.Online) == 0) obj.color = "red";
-        else obj.color = "green";
+        if (parseInt(data.maquinas[i].filters.Online) == 0) obj.color = data.maquinas[i].filters["OnlineColor"];
+        else obj.color = data.maquinas[i].filters["OnlineColor"];
 
       } else {
         obj.color = data.maquinas[i].color;
-        if (parseInt(data.maquinas[i].filters.Online) == 0) obj.conncolor = "red";
-        else obj.conncolor = "green";
+        if (parseInt(data.maquinas[i].filters.Online) == 0) obj.conncolor = data.maquinas[i].filters["OnlineColor"];
+        else obj.conncolor = data.maquinas[i].filters["OnlineColor"];
       }
 
       let node;
