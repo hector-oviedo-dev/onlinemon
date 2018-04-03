@@ -16,7 +16,7 @@ export class LeftSideComponent implements OnInit {
   @ViewChild("grid")
   private grid:ElementRef;
 
-  public menuLabels;
+  public menuLabels:any = { lock:{label:""},views:{label:""},filters:{label:""},search:{label:""} };
 
   public views = [ ];
   public filters = [ ];
@@ -34,9 +34,13 @@ export class LeftSideComponent implements OnInit {
     this.events = services.events;
 
     this.events.subscribe("onTools", (data) => this.onTools(data));
+    this.events.subscribe("onInfo", (data) => this.onInfo(data));
   }
   ngOnInit() {
 
+  }
+  public onInfo(data) {
+    this.info = data.info;
   }
   public onTools(data) {
     this.views = [];
@@ -63,7 +67,7 @@ export class LeftSideComponent implements OnInit {
       this.search.push(data.search[i]);
     }
 
-    this._buscarID = data.search[0].entitylabel;
+    if (data.search.length) this._buscarID = data.search[0].entitylabel;
 
     if (data.privileges.position) this.hasblocking = true;
     else this.hasblocking = false;

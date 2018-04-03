@@ -58,7 +58,7 @@
       <div style="width:60%;">
 
         <mat-form-field style="width:100%;">
-          <mat-select [(ngModel)]="_buscarID" [placeholder]="search[0].entitylabel"  style="width:100%;">
+          <mat-select [(ngModel)]="_buscarID" [placeholder]="_buscarID"  style="width:100%;">
             <mat-option *ngFor="let option of search" [value]="option.propertyname">{{option.propertylabel}}</mat-option>
           </mat-select>
         </mat-form-field>

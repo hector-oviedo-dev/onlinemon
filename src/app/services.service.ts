@@ -36,6 +36,8 @@ export class ServicesService {
 
     if (!this.isEditing) this.events.publish("onMachines", res);
 
+    this.events.publish("onInfo", res);
+
     if (recall) setTimeout(function(this) { this.getMachines(); }.bind(this), this.AUTO_REFRESH_TIME);
   }
   public connect() {

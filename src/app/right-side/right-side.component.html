@@ -1,7 +1,7 @@
 <div class="cont">
 
     <div class="boxClass">
-      <div *ngFor="let alert of alerts" [ngClass]="(!alert.Visto)?'boxItem':'boxItemDisabled'">
+      <div *ngFor="let alert of alerts" [ngClass]="(!alert.Visto)?'boxItem':'boxItemDisabled'" [style.background-color]="alert.Color">
         <mat-list-item class="boxHeader"><p class="boxHeaderContent">UID: {{alert.UID}}</p></mat-list-item>
 
         <mat-list-item class="boxHeader"><p class="boxHeaderContent">{{alert.fecha}}</p></mat-list-item>

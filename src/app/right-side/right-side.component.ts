@@ -28,6 +28,9 @@ export class RightSideComponent implements OnInit {
     for (let alert of data.alerts) {
       let alertDate = new Date(alert.FechaRecepcion);
       alert.fecha = alertDate.toLocaleString();
+
+      if (alert.Visto) alert.Color = "#F9FAFC";
+
       this.alerts.push(alert);
 
       if (!alert.Visto) visto = false;

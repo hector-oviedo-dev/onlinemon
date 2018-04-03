@@ -27,10 +27,10 @@ export class LayoutComponent implements OnInit {
     this.events.subscribe("SearchFound", (data) => this.onSearchFound(data));
   }
   @Input()
-    set ready(isReady: boolean) {
-      if (isReady) console.log("endup");
-      else console.log("oke");
-    }
+  set ready(isReady: boolean) {
+    if (isReady) console.log("endup");
+    else console.log("oke");
+  }
   ngOnInit() {
 
   }

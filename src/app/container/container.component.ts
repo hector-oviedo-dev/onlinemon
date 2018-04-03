@@ -12,8 +12,8 @@ import { EventsService } from 'angular4-events';
   styleUrls: ['./container.component.css']
 })
 export class ContainerComponent implements OnInit {
-  @Input()
-  public data:any;
+  //@Input()
+  //public data:any;
 
   @ViewChild('container', { read: ViewContainerRef }) container: ViewContainerRef;
 

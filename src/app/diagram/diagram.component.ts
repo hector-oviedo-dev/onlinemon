@@ -625,10 +625,9 @@ export class DiagramComponent implements OnInit {
         offline_prog_param:0,
         imgsource:""
       }
-      if (data.maquinas[i].filters["ImagenMonitoreo"] != "null") obj.imgsource = "assets/" + data.maquinas[i].filters["ImagenMonitoreo"];
-      else obj.imgsource = "assets/puesto.png";
 
-      console.log(" i ",i + obj.imgsource)
+      if (!data.maquinas[i].filters["ImagenMonitoreo"] || data.maquinas[i].filters["ImagenMonitoreo"] == "null" || data.maquinas[i].filters["ImagenMonitoreo"] == "undefined" || data.maquinas[i].filters["ImagenMonitoreo"] == "") obj.imgsource = "assets/puesto.png";
+      else  obj.imgsource = "assets/" + data.maquinas[i].filters["ImagenMonitoreo"];
 
       let arrTMP = data.maquinas[i].filters.CambioEstado.split(",");
 

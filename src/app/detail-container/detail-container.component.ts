@@ -6,7 +6,7 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./detail-container.component.css']
 })
 export class DetailContainerComponent implements OnInit {
-  @Input() set data(value) { this.rows = value; };
+  @Input() set data(value) {  if (value) this.rows = value; };
 
   @Input()
   public datatype:string = "";

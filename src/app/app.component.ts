@@ -39,8 +39,8 @@ export class AppComponent {
       let headers = new HttpHeaders();
       headers = headers.set('Content-Type', 'application/json; charset=utf-8');
 
-      //let url = "assets/config.json";
-      let url = "config.png";
+      let url = "assets/config.json";
+      //let url = "config.png";
       this.http.get(url, {headers: headers}).subscribe(res => {
         services._SERVICE_BASE = (res as any).server;
         services.AUTO_REFRESH_TIME_MINS = (res as any).timmer;
