@@ -21,6 +21,8 @@ export class AppComponent {
   public popupDialog:MatDialogRef<DialogPopup>;
 
   public privileges;
+
+  public icons = [];
   constructor(public http: HttpClient,public services:ServicesService, public dialog: MatDialog) {
     this.events = services.events;
     this.events.subscribe("onPopup", (data) => this.onPopup(data));
@@ -120,6 +122,27 @@ export class AppComponent {
 
     this.events.publish('onContent', res);
   }
+  public onIcons(data) {
+    this.icons = [];
+    for (var i = 0; i <data.length;i++) {
+      let icon = {
+        Img:"assets/"+data[i].Img,
+        Sp:data[i].Sp,
+        BtnName:data[i].BtnName
+      }
+      this.icons.push(icon);
+    }
+  }
+  public openProcedure(sp,btnname) {
+    this.services.doGet("getProcedure","?procedure="+sp+"&"+btnname).subscribe(
+        res => { this.onProcedureResult(res); },
+        err => { this.events.publish("onError", "404 Server Error"); }
+      );
+  }
+  public onProcedureResult(res) {
+    this.popupDialog = this.dialog.open(DialogPopup, { data: {} });
+    this.events.publish('onContent', res);
+  }
   public onAlerts(data) {
     this.hasAlerts = data;
   }
@@ -139,6 +162,8 @@ export class AppComponent {
     this.events.publish("onTools", res);
     this.events.publish("onAreas", res.areas);
     this.events.publish("onMachines", res);
+
+    this.onIcons(res.icons);
 
     this.services.getMachines();
   }

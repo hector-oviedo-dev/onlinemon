@@ -62,9 +62,10 @@ export class AutoGridComponent implements OnInit {
       for (var j = 0; j < props.length; j++) {
         for (var k = 0; k < this.cols.length; k++) {
           if (this.cols[k].def == props[j] && this.cols[k].type == "DateTime") {
-            let newDate = new Date(obj[props[j]]).toLocaleString();
+            let newDate = new Date(obj[props[j]]);
+            newDate.setTime( newDate.getTime() + newDate.getTimezoneOffset()*60*1000 );
 
-            obj[props[j]] = newDate;
+            obj[props[j]] = newDate.toLocaleString();
           }
         }
       }

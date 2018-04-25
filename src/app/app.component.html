@@ -24,6 +24,8 @@
       <img *ngIf="this.buttons" src="assets\date.png" align="right" style="position: absolute; right: 50px; top: 10px; z-index: 10;" (click)="openDateFilter()">
       <img *ngIf="this.services.isEditing && this.buttons" src="assets\warning.png" align="right" alt="Modo De Edicion" style="position: absolute; right: 80px; top: 10px; z-index: 10;">
 
+      <img [hidden]="!this.buttons" *ngFor="let icon of icons;let i = index;" [src]="icon.Img" align="right" style="position: absolute; top: 10px; z-index:10;" [style.right]="80 + i * 25 + 'px'" (click)="openProcedure(icon.Sp,icon.BtnName)">
+
     <app-layout></app-layout></div>
   <!--End Diagram-->
 
